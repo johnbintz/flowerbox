@@ -2,16 +2,10 @@ require 'tempfile'
 
 module Flowerbox
   module Runner
-    class Node
-      def self.run(files)
-        new(files).run
-      end
+    class Node < Base
+      def run(sprockets)
+        super
 
-      def initialize(files)
-        @files = files
-      end
-
-      def run
         file = Tempfile.new("node")
         file.print template
         file.close
@@ -22,23 +16,28 @@ module Flowerbox
       end
 
       def template
+        env = start_test_environment
+
         <<-JS
-var fs = require('fs');
-var window = this;
+var fs = require('fs'),
+    vm = require('vm');
+
+// expand the sandbox a bit
+var context = function() {};
+context.window = true;
+for (method in global) { context[method] = global[method]; }
 
 #{template_files.join("\n")}
-#{start_test_environment}
+#{env}
 JS
       end
 
       def template_files
-        @files.collect { |file| %{eval(fs.readFileSync('#{file}', 'utf-8'));} }
-      end
-
-      def start_test_environment
-        Flowerbox.test_environment.start_for(:node)
+        sprockets.files.collect { |file| %{vm.runInNewContext(fs.readFileSync('#{file}', 'utf-8'), context, '#{file}');} }
       end
     end
   end
 end
+
+Flowerbox.runner_environment = Flowerbox::Runner::Node.new
 

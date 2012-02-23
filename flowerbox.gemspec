@@ -21,4 +21,6 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency 'flowerbox-delivery'
   gem.add_dependency 'thor'
+  gem.add_dependency 'capybara'
+  gem.add_dependency 'sinatra'
 end

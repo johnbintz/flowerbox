@@ -5,7 +5,7 @@ require 'flowerbox-delivery'
 require 'thor'
 
 class Flowerbox::CLI < Thor
-  desc "test DIR SPEC_PATTERN", "Run the specs found in spec dir"
+  desc "test DIR", "Run the specs found in spec dir, loading spec_helper.rb for configuration details"
   method_options :pwd => :string
   def test(dir)
     Dir.chdir(pwd) do
@@ -15,18 +15,17 @@ class Flowerbox::CLI < Thor
 
       Tilt::CoffeeScriptTemplate.default_bare = Flowerbox.bare_coffeescript
 
-      sprockets = Flowerbox::Delivery::SprocketsHandler.new(:asset_paths => [ dir, Flowerbox.asset_paths ].flatten)
+      sprockets = Flowerbox::Delivery::SprocketsHandler.new(:asset_paths => [ Flowerbox.path.join("lib/assets/javascripts"), dir, Flowerbox.asset_paths ].flatten)
 
-      Flowerbox.load_test_environment(sprockets)
+      Flowerbox.test_environment.inject_into(sprockets)
 
       Flowerbox.spec_patterns.each do |pattern|
         Dir[File.join(dir, pattern)].each do |file|
-
           sprockets.add(file.gsub(dir + '/', ''))
         end
       end
 
-      exit Flowerbox::Runner::Node.run(sprockets.files)
+      exit Flowerbox.runner_environment.run(sprockets)
     end
   end
 

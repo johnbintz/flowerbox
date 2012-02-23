@@ -3,37 +3,45 @@ require 'jasmine-core'
 module Flowerbox
   module TestEnvironment
     class Jasmine
-      def self.inject_into(sprockets)
-        sprockets.append_path(::Jasmine::Core.path)
+      def inject_into(sprockets)
+        @sprockets = sprockets
 
-        sprockets.add('jasmine.js')
-        sprockets.add('jasmine-html.js')
+        @sprockets.append_path(::Jasmine::Core.path)
+
+        @sprockets.add('jasmine.js')
+        @sprockets.add('jasmine-html.js')
       end
 
-      def self.start_for(runner)
-        <<-JS
-jasmine.NodeReporter = function() {}
+      def start_for(runner)
+        @sprockets.add("flowerbox/jasmine/#{runner}")
 
-jasmine.NodeReporter.prototype.reportSpecResults = function(spec) {
-  console.log(spec.results().totalCount + '/' + spec.results().failedCount);
+        case runner
+        when :node
+          <<-JS
+var jasmine = context.jasmine;
 
-  if (spec.results().failedCount == 0) {
-    process.exit(0);
-  } else {
-    process.exit(1);
-  }
-}
-
-jasmine.NodeReporter.prototype.reportRunnerResults = function(runner) {
-}
-
-jasmine.getEnv().addReporter(new jasmine.NodeReporter());
+#{jasmine_reporters.join("\n")}
 jasmine.getEnv().execute();
 JS
+        when :selenium
+          <<-JS
+jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+jasmine.getEnv().addReporter(new jasmine.SimpleSeleniumReporter());
+jasmine.getEnv().execute();
+JS
+        end
+      end
+
+      def jasmine_reporters
+        reporters.collect { |reporter| %{jasmine.getEnv().addReporter(new jasmine.#{reporter}());} }
+      end
+
+      def reporters
+        @reporters ||= []
       end
     end
   end
 end
 
-Flowerbox.test_environment = Flowerbox::TestEnvironment::Jasmine
+Flowerbox.test_environment = Flowerbox::TestEnvironment::Jasmine.new
 

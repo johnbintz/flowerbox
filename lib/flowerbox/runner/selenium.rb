@@ -18,7 +18,11 @@ module Flowerbox
         end
 
         post '/results' do
-          runner.results = request.env['rack.input'].read
+          runner.results = request.body.string
+        end
+
+        post '/log' do
+          runner.log(request.body.string)
         end
 
         get %r{^/__F__(/.*)$} do |file|
@@ -63,6 +67,10 @@ module Flowerbox
         end
       end
 
+      def log(msg)
+        puts msg
+      end
+
       def template
         env = start_test_environment
 
@@ -70,6 +78,22 @@ module Flowerbox
 <html>
   <head>
     <title>Flowerbox - Selenium Runner</title>
+    <script type="text/javascript">
+this.Flowerbox = {
+  contact: function(url, message) {
+    xhr = new XMLHttpRequest();
+    xhr.open("POST", "/" + url);
+    xhr.send(message);
+  }
+}
+
+console._log = console.log;
+
+console.log = function(msg) {
+  console._log(msg);
+  Flowerbox.contact("log", msg);
+}
+    </script>
     #{template_files.join("\n")}
   </head>
   <body>

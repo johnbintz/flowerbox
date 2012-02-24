@@ -15,6 +15,8 @@ Feature: Basic Run
       """
       class Cat
         meow: -> "meow"
+
+      console.log("made it")
       """
 
   Scenario: Use the Node runner using Jasmine

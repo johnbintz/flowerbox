@@ -8,17 +8,18 @@ module Flowerbox
       def run(sprockets)
         super
 
-        file = Tempfile.new("node")
-        file.print template
-        file.close
+        file = File.join(Dir.pwd, ".node-tmp.#{Time.now.to_i}.js")
+        File.open(file, 'wb') { |fh| fh.print template.tap { |o| puts o } }
 
         server.start
 
-        system %{node #{file.path}}
+        system %{node #{file}}
 
         server.stop
 
         $?.exitstatus
+      ensure
+        File.unlink(file) if file
       end
 
       def template
@@ -27,45 +28,54 @@ module Flowerbox
         <<-JS
 var fs = require('fs'),
     vm = require('vm'),
-    http = require('http');
+    http = require('http'),
+    jsdom = require('jsdom');
 
 // expand the sandbox a bit
 var context = function() {};
-context.window = true;
 for (method in global) { context[method] = global[method]; }
 
-var files = #{sprockets.files.to_json};
-var fileRunner = function() {
-  if (files.length > 0) {
-    var file = files.shift();
-    console.log(file);
+jsdom.env(
+  "<html><head><title></title></head><body></body></html>", [], function(errors, window) {
+  context.window = window;
 
-    var options = {
-      host: "localhost",
-      port: #{server.port},
-      path: "/__F__" + file,
-      method: "GET"
-    };
+  var files = #{sprockets.files.to_json};
+  var fileRunner = function() {
+    if (files.length > 0) {
+      var file = files.shift();
 
-    var request = http.request(options, function(response) {
-      var data = '';
+      var options = {
+        host: "localhost",
+        port: #{server.port},
+        path: "/__F__" + file,
+        method: "GET"
+      };
 
-      response.on('data', function(chunk) {
-        data += chunk;
+      var request = http.request(options, function(response) {
+        var data = '';
+
+        response.on('data', function(chunk) {
+          data += chunk;
+        });
+
+        response.on('end', function() {
+          vm.runInNewContext(data, context, file);
+
+          for (thing in window) {
+            if (!context[thing]) { context[thing] = window[thing] }
+          }
+
+          fileRunner();
+        });
       });
 
-      response.on('end', function() {
-        vm.runInNewContext(data, context, file);
-        fileRunner();
-      });
-    });
-
-    request.end();
-  } else {
-    #{env}
-  }
-};
-fileRunner();
+      request.end();
+    } else {
+      #{env}
+    }
+  };
+  fileRunner();
+});
 JS
       end
     end

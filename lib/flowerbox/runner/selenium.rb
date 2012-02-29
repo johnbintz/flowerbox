@@ -1,54 +1,20 @@
-require 'capybara'
-require 'capybara/dsl'
-require 'sinatra'
-require 'thread'
+require 'selenium-webdriver'
 
 module Flowerbox
   module Runner
     class Selenium < Base
-      include Capybara::DSL
-
-      class Rack < Sinatra::Base
-        class << self
-          attr_accessor :runner
-        end
-
-        def runner
-          self.class.runner
-        end
-
-        post '/results' do
-          runner.results = request.body.string
-        end
-
-        post '/log' do
-          runner.log(request.body.string)
-        end
-
-        get %r{^/__F__(/.*)$} do |file|
-          File.read(file)
-        end
-
-        get '/' do
-          runner.template
-        end
-      end
-
       attr_accessor :browser, :results
 
       def run(sprockets)
         super
 
-        Capybara.register_driver :firefox do |app|
-          Capybara::Selenium::Driver.new(app, :browser => :firefox)
-        end
-
-        Capybara.default_driver = :firefox
+        selenium = ::Selenium::WebDriver.for :firefox
 
         Rack.runner = self
-        Capybara.app = Rack
 
-        visit '/'
+        server.start
+
+        selenium.navigate.to "http://localhost:#{server.port}/"
 
         1.upto(30) do
           if results
@@ -65,6 +31,8 @@ module Flowerbox
         else
           exit 1
         end
+      ensure
+        selenium.quit if selenium
       end
 
       def log(msg)

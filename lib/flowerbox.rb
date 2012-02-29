@@ -7,6 +7,8 @@ module Flowerbox
     autoload :Base, 'flowerbox/runner/base'
   end
 
+  autoload :Rack, 'flowerbox/rack'
+
   class << self
     def spec_patterns
       @spec_patterns ||= []

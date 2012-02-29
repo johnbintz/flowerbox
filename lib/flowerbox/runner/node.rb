@@ -1,4 +1,6 @@
 require 'tempfile'
+require 'flowerbox/delivery/server'
+require 'json'
 
 module Flowerbox
   module Runner
@@ -10,7 +12,11 @@ module Flowerbox
         file.print template
         file.close
 
+        server.start
+
         system %{node #{file.path}}
+
+        server.stop
 
         $?.exitstatus
       end
@@ -20,20 +26,47 @@ module Flowerbox
 
         <<-JS
 var fs = require('fs'),
-    vm = require('vm');
+    vm = require('vm'),
+    http = require('http');
 
 // expand the sandbox a bit
 var context = function() {};
 context.window = true;
 for (method in global) { context[method] = global[method]; }
 
-#{template_files.join("\n")}
-#{env}
-JS
-      end
+var files = #{sprockets.files.to_json};
+var fileRunner = function() {
+  if (files.length > 0) {
+    var file = files.shift();
+    console.log(file);
 
-      def template_files
-        sprockets.files.collect { |file| %{vm.runInNewContext(fs.readFileSync('#{file}', 'utf-8'), context, '#{file}');} }
+    var options = {
+      host: "localhost",
+      port: #{server.port},
+      path: "/__F__" + file,
+      method: "GET"
+    };
+
+    var request = http.request(options, function(response) {
+      var data = '';
+
+      response.on('data', function(chunk) {
+        data += chunk;
+      });
+
+      response.on('end', function() {
+        vm.runInNewContext(data, context, file);
+        fileRunner();
+      });
+    });
+
+    request.end();
+  } else {
+    #{env}
+  }
+};
+fileRunner();
+JS
       end
     end
   end

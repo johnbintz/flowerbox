@@ -14,6 +14,15 @@ module Flowerbox
       def start_test_environment
         Flowerbox.test_environment.start_for(type)
       end
+
+      def server
+        return @server if @server
+
+        @server = Flowerbox::Delivery::Server.new(:app => Flowerbox::Rack)
+        Flowerbox::Rack.runner = self
+
+        @server
+      end
     end
   end
 end

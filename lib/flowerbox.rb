@@ -20,6 +20,12 @@ module Flowerbox
 
   autoload :Rack, 'flowerbox/rack'
 
+  autoload :ResultSet, 'flowerbox/result_set'
+  autoload :GatheredResult, 'flowerbox/gathered_result'
+  autoload :Result, 'flowerbox/result'
+  autoload :Failure, 'flowerbox/failure'
+  autoload :Exception, 'flowerbox/exception'
+
   class << self
     def spec_patterns
       @spec_patterns ||= []
@@ -64,11 +70,14 @@ module Flowerbox
 
       Tilt::CoffeeScriptTemplate.default_bare = Flowerbox.bare_coffeescript
 
-      result = Flowerbox.runner_environment.collect do |env|
-        env.run(build_sprockets_for(dir))
+      result_set = ResultSet.new
+
+      Flowerbox.runner_environment.each do |env|
+        result_set << env.run(build_sprockets_for(dir))
       end
 
-      result.max
+      result_set.print
+      result_set.exitstatus
     end
 
     def build_sprockets_for(dir)

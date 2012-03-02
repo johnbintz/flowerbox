@@ -18,32 +18,7 @@ module Flowerbox
 
         puts
 
-        failures.each do |failure_set|
-          if failure_set.first['splitName']
-            puts failure_set.first['splitName'].join(' ')
-          end
-
-          failure_set.each do |failure|
-            case failure['trace']['stack']
-            when String
-              # exception
-              puts failure['trace']['stack']
-            else
-              # failed test
-              puts %{#{failure['message']} (#{failure['trace']['stack'].first})}
-            end
-          end
-
-          puts
-        end
-
-        puts "#{total_count} tests, #{failure_count} failures, #{time.to_f / 1000} sec"
-
-        if failures.length == 0
-          $?.exitstatus
-        else
-          1
-        end
+        ResultSet.from_failures(failures, :runner => name, :time => time)
       end
 
       def type

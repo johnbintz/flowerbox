@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'json'
 
 module Flowerbox
   class Rack < Sinatra::Base
@@ -10,12 +11,32 @@ module Flowerbox
       self.class.runner
     end
 
-    post '/results' do
-      runner.results = request.body.string
+    def data
+      JSON.parse(request.body.string)
     end
 
-    post '/log' do
-      runner.log(request.body.string)
+    def self.empty_post(*args, &block)
+      post(*args) do
+        instance_eval(&block)
+
+        ""
+      end
+    end
+
+    empty_post '/results' do
+      runner.finish!(data.flatten.first)
+    end
+
+    empty_post '/start_test' do
+      runner.tests << data.flatten
+    end
+
+    empty_post '/finish_test' do
+      runner.add_failures(data.flatten[1..-1])
+    end
+
+    empty_post '/log' do
+      runner.log(data.first)
     end
 
     get %r{^/__F__(/.*)$} do |file|

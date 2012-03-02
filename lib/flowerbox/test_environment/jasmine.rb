@@ -3,6 +3,10 @@ require 'jasmine-core'
 module Flowerbox
   module TestEnvironment
     class Jasmine
+      def name
+        self.class.name.split("::").last
+      end
+
       def inject_into(sprockets)
         @sprockets = sprockets
 
@@ -13,9 +17,10 @@ module Flowerbox
       end
 
       def start_for(runner)
-        @sprockets.add("flowerbox/jasmine/#{runner}")
+        @sprockets.add("flowerbox/jasmine")
+        @sprockets.add("flowerbox/jasmine/#{runner.type}")
 
-        case runner
+        case runner.type
         when :node
           <<-JS
 var jasmine = context.jasmine;
@@ -25,8 +30,7 @@ jasmine.getEnv().execute();
 JS
         when :selenium
           <<-JS
-jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-jasmine.getEnv().addReporter(new jasmine.SimpleSeleniumReporter());
+jasmine.getEnv().addReporter(new jasmine.FlowerboxReporter());
 jasmine.getEnv().execute();
 JS
         end
@@ -37,11 +41,9 @@ JS
       end
 
       def reporters
-        @reporters ||= []
+        @reporters ||= [ 'FlowerboxReporter' ]
       end
     end
   end
 end
-
-Flowerbox.test_environment = Flowerbox::TestEnvironment::Jasmine.new
 

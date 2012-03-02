@@ -3,36 +3,33 @@ require 'selenium-webdriver'
 module Flowerbox
   module Runner
     class Selenium < Base
-      attr_accessor :browser, :results
+      MAX_COUNT = 30
+
+      def name
+        raise StandardError.new("Override me")
+      end
+
+      def type
+        :selenium
+      end
 
       def run(sprockets)
-        super
+        super do
+          begin
+            selenium = ::Selenium::WebDriver.for(browser)
 
-        selenium = ::Selenium::WebDriver.for :firefox
+            selenium.navigate.to "http://localhost:#{server.port}/"
 
-        Rack.runner = self
+            @count = 0
 
-        server.start
-
-        selenium.navigate.to "http://localhost:#{server.port}/"
-
-        1.upto(30) do
-          if results
-            break
-          else
-            sleep 1
+            while @count < MAX_COUNT && !finished?
+              @count += 1
+              sleep 0.1
+            end
+          ensure
+            selenium.quit if selenium
           end
         end
-
-        if results
-          puts results
-
-          exit (results.split('/').last.to_i == 0) ? 0 : 1
-        else
-          exit 1
-        end
-      ensure
-        selenium.quit if selenium
       end
 
       def log(msg)
@@ -47,14 +44,6 @@ module Flowerbox
   <head>
     <title>Flowerbox - Selenium Runner</title>
     <script type="text/javascript">
-this.Flowerbox = {
-  contact: function(url, message) {
-    xhr = new XMLHttpRequest();
-    xhr.open("POST", "/" + url);
-    xhr.send(message);
-  }
-}
-
 console._log = console.log;
 
 console.log = function(msg) {
@@ -67,6 +56,8 @@ console.log = function(msg) {
   <body>
     <h1>Flowerbox - Selenium Runner</h1>
     <script type="text/javascript">
+      Flowerbox.environment = '#{browser}';
+
       #{env}
     </script>
   </body>
@@ -77,8 +68,13 @@ HTML
       def template_files
         sprockets.files.collect { |file| %{<script type="text/javascript" src="/__F__#{file}"></script>} }
       end
+
+      def add_failures(data)
+        super
+
+        @count = 0
+      end
     end
   end
 end
 
-Flowerbox.runner_environment = Flowerbox::Runner::Selenium.new

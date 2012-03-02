@@ -1,9 +1,11 @@
-class jasmine.SimpleNodeReporter
-  reportRunnerResults: (runner) ->
-    console.log(runner.results().totalCount + '/' + runner.results().failedCount)
+jasmine.Spec.beforeAddMatcherResult().push ->
+  if !@passed_
+    Error.prepareStackTrace_ = Error.prepareStackTrace
+    Error.prepareStackTrace = (err, stack) -> stack
 
-    if runner.results().failedCount == 0
-      process.exit(0)
-    else
-      process.exit(1)
+    errorInfo = new Error().stack[3]
+
+    @trace = { stack: [ "#{errorInfo.getFileName()}:#{errorInfo.getLineNumber()}" ] }
+
+    Error.prepareStackTrace = Error.prepareStackTrace_
 

@@ -13,7 +13,7 @@ module Flowerbox
         :node
       end
 
-      def run(sprockets)
+      def run(sprockets, spec_files)
         super do
           begin
             file = File.join(Dir.pwd, ".node-tmp.#{Time.now.to_i}.js")
@@ -30,6 +30,7 @@ module Flowerbox
         env = start_test_environment
 
         <<-JS
+// whoa node
 var fs = require('fs'),
     vm = require('vm'),
     http = require('http'),
@@ -44,6 +45,8 @@ jsdom.env(
   "<html><head><title></title></head><body></body></html>", [], function(errors, window) {
   context.window = window;
   context.XMLHttpRequest = xhr.XMLHttpRequest;
+
+  var gotFlowerbox = false;
 
   var files = #{sprockets.files.to_json};
   var fileRunner = function() {
@@ -71,8 +74,11 @@ jsdom.env(
             if (!context[thing]) { context[thing] = window[thing] }
           }
 
-          if (context.Flowerbox) {
+          if (!gotFlowerbox && context.Flowerbox) {
             context.Flowerbox.baseUrl = "http://localhost:#{server.port}/";
+            context.Flowerbox.environment = 'node';
+
+            gotFlowerbox = true;
           }
 
           fileRunner();
@@ -91,6 +97,4 @@ JS
     end
   end
 end
-
-Flowerbox.runner_environment = Flowerbox::Runner::Node.new
 

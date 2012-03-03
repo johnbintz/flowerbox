@@ -9,3 +9,4 @@ jasmine.Spec.beforeAddMatcherResult().push ->
 
     Error.prepareStackTrace = Error.prepareStackTrace_
 
+Flowerbox.fail = -> process.exit(1)

@@ -25,3 +25,8 @@ jasmine.Spec.beforeAddMatcherResult = ->
 jasmine.Spec.beforeAddMatcherResult().push (spec) ->
   @splitName = spec.getSpecSplitName()
 
+Flowerbox.only = (envs..., code) ->
+  for env in envs
+    if Flowerbox.environment == env
+      describe("only in #{envs.join(', ')}", code)
+

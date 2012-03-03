@@ -1,12 +1,13 @@
 module Flowerbox
   module Runner
     class Base
-      attr_reader :sprockets
+      attr_reader :sprockets, :spec_files
 
       attr_accessor :time, :results
 
-      def run(sprockets)
+      def run(sprockets, spec_files)
         @sprockets = sprockets
+        @spec_files = spec_files
 
         puts "Flowerbox running your #{Flowerbox.test_environment.name} tests on #{name}..."
 
@@ -44,6 +45,10 @@ module Flowerbox
 
       def tests
         @tests ||= []
+      end
+
+      def add_tests(new_tests)
+        tests << new_tests
       end
 
       def failures

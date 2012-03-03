@@ -13,7 +13,7 @@ module Flowerbox
         :selenium
       end
 
-      def run(sprockets)
+      def run(sprockets, spec_files)
         super do
           begin
             selenium = ::Selenium::WebDriver.for(browser)

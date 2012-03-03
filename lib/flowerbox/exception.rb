@@ -1,13 +1,13 @@
 module Flowerbox
   class Exception < Result
-    attr_reader :message
+    attr_reader :name
 
-    def initialize(message)
-      @message = message
+    def initialize(name)
+      @name = name
     end
 
     def print
-      puts message
+      puts "[#{runners.join(',')}] #{name}"
       puts
     end
   end

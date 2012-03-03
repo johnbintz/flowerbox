@@ -9,7 +9,7 @@ module Flowerbox
             Failure.new(name, failure['message'], failure['trace']['stack'].first)
           end
         else
-          Exception.new(result_data['trace']['stack'])
+          Exception.new(result_data.first['trace']['stack'])
         end
       end.flatten
 

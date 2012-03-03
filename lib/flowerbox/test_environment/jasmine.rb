@@ -20,6 +20,8 @@ module Flowerbox
         @sprockets.add("flowerbox/jasmine")
         @sprockets.add("flowerbox/jasmine/#{runner.type}")
 
+        runner.spec_files.each { |file| @sprockets.add(file) }
+
         case runner.type
         when :node
           <<-JS

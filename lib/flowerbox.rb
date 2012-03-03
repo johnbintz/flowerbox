@@ -40,7 +40,7 @@ module Flowerbox
     end
 
     def run_with(*whats)
-      self.runner_environment = whats.collect { |what| Flowerbox::Runner.for(what) }
+      self.runner_environment = whats.flatten.collect { |what| Flowerbox::Runner.for(what.to_s) }
     end
 
     def path
@@ -62,8 +62,12 @@ module Flowerbox
       @bare_coffeescript ||= true
     end
 
-    def run(dir)
+    def run(dir, options = {})
       load File.join(dir, 'spec_helper.rb')
+
+      if options[:runners]
+        Flowerbox.run_with(options[:runners].split(','))
+      end
 
       require 'coffee_script'
       require 'tilt/coffee'
@@ -73,7 +77,7 @@ module Flowerbox
       result_set = ResultSet.new
 
       Flowerbox.runner_environment.each do |env|
-        result_set << env.run(build_sprockets_for(dir))
+        result_set << env.run(build_sprockets_for(dir), spec_files_for(dir))
       end
 
       result_set.print
@@ -94,8 +98,6 @@ module Flowerbox
       sprockets.add('json2')
 
       Flowerbox.test_environment.inject_into(sprockets)
-
-      spec_files_for(dir).each { |file| sprockets.add(file) }
 
       sprockets
     end

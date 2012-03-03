@@ -6,10 +6,6 @@ module Flowerbox
       @name, @message, @file = name, message, file
     end
 
-    def runners
-      @runners ||= []
-    end
-
     def ==(other)
       @name == other.name && @message == other.message
     end

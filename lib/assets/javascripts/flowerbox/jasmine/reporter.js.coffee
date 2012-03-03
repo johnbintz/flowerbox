@@ -5,6 +5,12 @@ class jasmine.FlowerboxReporter
     Flowerbox.contact("starting")
   reportSpecStarting: (spec) ->
     Flowerbox.contact("start_test", spec.description)
+
+    if spec.description == 'encountered a declaration exception'
+      Flowerbox.contact("finish_test", spec.description, { trace: { stack: [ spec.description ] } })
+      Flowerbox.contact("results", 0)
+      Flowerbox.fail() if Flowerbox.fail?
+
   reportSpecResults: (spec) ->
     failures = []
 

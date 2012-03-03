@@ -6,9 +6,10 @@ require 'thor'
 class Flowerbox::CLI < Thor
   desc "test DIR", "Run the specs found in spec dir, loading spec_helper.rb for configuration details"
   method_options :pwd => :string
+  method_options :runners => :string
   def test(dir)
     Dir.chdir(pwd) do
-      exit Flowerbox.run(dir)
+      exit Flowerbox.run(dir, options)
     end
   end
 

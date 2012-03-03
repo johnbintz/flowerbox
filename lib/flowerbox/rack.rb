@@ -28,7 +28,7 @@ module Flowerbox
     end
 
     empty_post '/start_test' do
-      runner.tests << data.flatten
+      runner.add_tests(data.flatten)
     end
 
     empty_post '/finish_test' do

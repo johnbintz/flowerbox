@@ -24,10 +24,6 @@ module Flowerbox
     end
 
     empty_post '/results' do
-      p "made it"
-
-      p data
-
       runner.finish!(data.flatten.first)
     end
 

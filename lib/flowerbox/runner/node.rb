@@ -20,6 +20,15 @@ module Flowerbox
         :node
       end
 
+      def configured?
+        File.directory?(File.join(Dir.pwd, 'node_modules/jsdom')) &&
+        File.directory?(File.join(Dir.pwd, 'node_modules/XMLHttpRequest'))
+      end
+
+      def configure
+        system %{bash -c "mkdir -p node_modules && npm link jsdom && npm link xmlhttprequest"}
+      end
+
       def run(sprockets, spec_files, options)
         super do
           begin

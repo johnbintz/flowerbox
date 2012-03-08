@@ -14,8 +14,8 @@ module Flowerbox
       end
 
       def start_for(runner)
-        @sprockets.add("flowerbox/jasmine")
-        @sprockets.add("flowerbox/jasmine/#{runner.type}")
+        @sprockets.add("flowerbox/jasmine.js")
+        @sprockets.add("flowerbox/jasmine/#{runner.type}.js")
 
         runner.spec_files.each { |file| @sprockets.add(file) }
 

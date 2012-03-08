@@ -26,6 +26,20 @@ module Flowerbox
         @results
       end
 
+      def configured?
+        true
+      end
+
+      def configure
+      end
+
+      def ensure_configured!
+        if !configured?
+          puts "#{console_name} is not configured for this project, configuring now..."
+          configure
+        end
+      end
+
       def type
         self.class.name.to_s.split('::').last.downcase.to_sym
       end
@@ -42,7 +56,10 @@ module Flowerbox
       def server
         return @server if @server
 
-        @server = Flowerbox::Delivery::Server.new(:app => Flowerbox::Rack)
+        server_options = { :app => Flowerbox::Rack }
+        server_options[:logging] = true if options[:verbose]
+
+        @server = Flowerbox::Delivery::Server.new(server_options)
         Flowerbox::Rack.runner = self
 
         @server

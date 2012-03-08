@@ -8,11 +8,13 @@ class Flowerbox::CLI < Thor
   method_options :pwd => :string
   method_options :runners => :string
   method_options :verbose => false
-  def test(dir)
+  def test(dir = "spec/javascripts")
     Dir.chdir(pwd) do
       exit Flowerbox.run(dir, options)
     end
   end
+
+  default_task :test
 
   no_tasks do
     def pwd
@@ -26,3 +28,4 @@ class Flowerbox::CLI < Thor
 end
 
 Flowerbox::CLI.start
+

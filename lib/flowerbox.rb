@@ -82,6 +82,8 @@ module Flowerbox
       result_set = ResultSet.new
 
       Flowerbox.runner_environment.each do |env|
+        env.ensure_configured!
+
         result_set << env.run(build_sprockets_for(dir), spec_files_for(dir), options)
       end
 

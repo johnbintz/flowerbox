@@ -13,12 +13,14 @@ module Flowerbox
         :selenium
       end
 
-      def run(sprockets, spec_files)
+      def run(sprockets, spec_files, options)
         super do
           begin
             selenium = ::Selenium::WebDriver.for(browser)
 
             selenium.navigate.to "http://localhost:#{server.port}/"
+
+            sleep 10
 
             @count = 0
 

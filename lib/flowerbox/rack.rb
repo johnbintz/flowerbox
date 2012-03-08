@@ -24,6 +24,10 @@ module Flowerbox
     end
 
     empty_post '/results' do
+      p "made it"
+
+      p data
+
       runner.finish!(data.flatten.first)
     end
 
@@ -32,7 +36,7 @@ module Flowerbox
     end
 
     empty_post '/finish_test' do
-      runner.add_failures(data.flatten[1..-1])
+      runner.add_results(data.flatten[1..-1])
     end
 
     empty_post '/log' do

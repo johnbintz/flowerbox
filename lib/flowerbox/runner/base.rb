@@ -1,15 +1,18 @@
 module Flowerbox
   module Runner
     class Base
-      attr_reader :sprockets, :spec_files
+      attr_reader :sprockets, :spec_files, :options
 
-      attr_accessor :time, :results
+      attr_accessor :results
 
-      def run(sprockets, spec_files)
-        @sprockets = sprockets
-        @spec_files = spec_files
+      def initialize
+        @results = ResultSet.new
+      end
 
-        puts "Flowerbox running your #{Flowerbox.test_environment.name} tests on #{name}..."
+      def run(sprockets, spec_files, options)
+        @sprockets, @spec_files, @options = sprockets, spec_files, options
+
+        puts "Flowerbox running your #{Flowerbox.test_environment.name} tests on #{console_name}..."
 
         server.start
 
@@ -18,8 +21,9 @@ module Flowerbox
         server.stop
 
         puts
+        puts
 
-        ResultSet.from_failures(failures, :runner => name, :time => time)
+        @results
       end
 
       def type
@@ -28,6 +32,11 @@ module Flowerbox
 
       def start_test_environment
         Flowerbox.test_environment.start_for(self)
+      end
+
+      def time=(time)
+        p time
+        @results.time = time
       end
 
       def server
@@ -55,16 +64,12 @@ module Flowerbox
         @failures ||= []
       end
 
-      def add_failures(test_failures)
-        if test_failures.length == 0
-          print '.'
-        else
-          print 'F'
-        end
+      def add_results(test_results)
+        results = result_set_from_test_results(test_results)
 
-        $stdout.flush
+        results.print_progress
 
-        failures << test_failures
+        @results << results
       end
 
       def total_count
@@ -83,6 +88,11 @@ module Flowerbox
 
       def finished?
         @finished
+      end
+
+      private
+      def result_set_from_test_results(test_results)
+        ResultSet.from_results(test_results.first, options.merge(:runner => name))
       end
     end
   end

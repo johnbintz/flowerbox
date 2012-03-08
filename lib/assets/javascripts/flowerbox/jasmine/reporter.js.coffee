@@ -12,13 +12,7 @@ class jasmine.FlowerboxReporter
       Flowerbox.fail() if Flowerbox.fail?
 
   reportSpecResults: (spec) ->
-    failures = []
-
-    for result in spec.results().getItems()
-      if result.type == 'expect' && !result.passed_
-        failures.push(result)
-
-    Flowerbox.contact("finish_test", spec.description, failures)
+    Flowerbox.contact("finish_test", spec.description, spec.results())
   reportRunnerResults: (runner) ->
     Flowerbox.contact("results", (new Date().getTime()) - @time)
 

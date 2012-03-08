@@ -23,4 +23,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'thor'
   gem.add_dependency 'selenium-webdriver'
   gem.add_dependency 'sinatra'
+  gem.add_dependency 'rainbow'
 end

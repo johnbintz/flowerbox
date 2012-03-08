@@ -1,5 +1,6 @@
 require "flowerbox/version"
 require 'flowerbox-delivery'
+require 'rainbow'
 
 module Flowerbox
   autoload :Runner, 'flowerbox/runner'
@@ -15,7 +16,9 @@ module Flowerbox
   autoload :TestEnvironment, 'flowerbox/test_environment'
 
   module TestEnvironment
+    autoload :Base, 'flowerbox/test_environment/base'
     autoload :Jasmine, 'flowerbox/test_environment/jasmine'
+    autoload :Cucumber, 'flowerbox/test_environment/cucumber'
   end
 
   autoload :Rack, 'flowerbox/rack'
@@ -23,6 +26,8 @@ module Flowerbox
   autoload :ResultSet, 'flowerbox/result_set'
   autoload :GatheredResult, 'flowerbox/gathered_result'
   autoload :Result, 'flowerbox/result'
+  autoload :BaseResult, 'flowerbox/base_result'
+  autoload :Success, 'flowerbox/success'
   autoload :Failure, 'flowerbox/failure'
   autoload :Exception, 'flowerbox/exception'
 
@@ -77,7 +82,7 @@ module Flowerbox
       result_set = ResultSet.new
 
       Flowerbox.runner_environment.each do |env|
-        result_set << env.run(build_sprockets_for(dir), spec_files_for(dir))
+        result_set << env.run(build_sprockets_for(dir), spec_files_for(dir), options)
       end
 
       result_set.print

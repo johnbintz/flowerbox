@@ -6,14 +6,21 @@ module Flowerbox
   module Runner
     class Node < Base
       def name
-        "Node.js"
+        "node.js"
+      end
+
+      def console_name
+        "n".foreground(:white) +
+        "o".foreground('#8cc84b') +
+        "de".foreground(:white) +
+        ".js".foreground('#8cc84b')
       end
 
       def type
         :node
       end
 
-      def run(sprockets, spec_files)
+      def run(sprockets, spec_files, options)
         super do
           begin
             file = File.join(Dir.pwd, ".node-tmp.#{Time.now.to_i}.js")

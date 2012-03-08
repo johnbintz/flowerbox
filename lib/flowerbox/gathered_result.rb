@@ -14,6 +14,18 @@ module Flowerbox
       @results ||= []
     end
 
+    def successes
+      results.find_all(&:success?)
+    end
+
+    def failures
+      results.reject(&:success?)
+    end
+
+    def success?
+      @results.all?(&:success?)
+    end
+
     def print
       puts name.join(' ')
 

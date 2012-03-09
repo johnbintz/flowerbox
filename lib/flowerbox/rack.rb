@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'json'
+require 'cgi'
 
 module Flowerbox
   class Rack < Sinatra::Base

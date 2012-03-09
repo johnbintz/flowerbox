@@ -1,8 +1,10 @@
 module Flowerbox
   module TestEnvironment
-    class Cucumber
+    class Cucumber < Base
       def inject_into(sprockets)
         @sprockets = sprockets
+
+        @sprockets.register_engine('.feature', Flowerbox::Delivery::Tilt::FeatureTemplate)
 
         @sprockets.add('cucumber.js')
       end
@@ -14,21 +16,18 @@ module Flowerbox
         runner.spec_files.each { |file| @sprockets.add(file) }
 
         <<-JS
-if (typeof context != 'undefined' && typeof jasmine == 'undefined') {
-  jasmine = context.jasmine;
-}
+context.Cucumber = context.require('./cucumber');
 
-jasmine.getEnv().addReporter(new jasmine.FlowerboxReporter());
-#{jasmine_reporters.join("\n")}
-jasmine.getEnv().execute();
+context.cucumber = context.Cucumber(context.Flowerbox.Cucumber.features(), context.Flowerbox.World());
+context.cucumber.attachListener(new context.Flowerbox.Cucumber.Reporter());
+context.cucumber.start(function() {});
 JS
-      end
-
-      def jasmine_reporters
-        reporters.collect { |reporter| %{jasmine.getEnv().addReporter(new jasmine.#{reporter}());} }
       end
     end
   end
 end
 
+module Flowerbox::Delivery::Tilt
+  autoload :FeatureTemplate, 'flowerbox/delivery/tilt/feature_template'
+end
 

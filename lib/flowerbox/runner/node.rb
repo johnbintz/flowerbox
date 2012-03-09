@@ -22,11 +22,12 @@ module Flowerbox
 
       def configured?
         File.directory?(File.join(Dir.pwd, 'node_modules/jsdom')) &&
-        File.directory?(File.join(Dir.pwd, 'node_modules/XMLHttpRequest'))
+        File.directory?(File.join(Dir.pwd, 'node_modules/XMLHttpRequest')) &&
+        File.directory?(File.join(Dir.pwd, 'node_modules/cucumber'))
       end
 
       def configure
-        system %{bash -c "mkdir -p node_modules && npm link jsdom && npm link xmlhttprequest"}
+        system %{bash -c "mkdir -p node_modules && npm link jsdom && npm link xmlhttprequest && npm link cucumber"}
       end
 
       def run(sprockets, spec_files, options)

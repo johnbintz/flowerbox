@@ -49,7 +49,6 @@ module Flowerbox
       end
 
       def time=(time)
-        p time
         @results.time = time
       end
 

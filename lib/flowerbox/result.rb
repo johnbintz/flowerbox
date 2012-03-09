@@ -27,13 +27,13 @@ module Flowerbox
     end
 
     def filename
-      file.split(":").first
+      file.to_s.split(":").first
     end
 
     def line_number
       return @line_number if @line_number
 
-      @line_number = file.split(":").last
+      @line_number = file.to_s.split(":").last
       @line_number = "~#{@line_number}" if file_translated?
       @line_number
     end

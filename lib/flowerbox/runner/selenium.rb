@@ -20,8 +20,6 @@ module Flowerbox
 
             selenium.navigate.to "http://localhost:#{server.port}/"
 
-            sleep 10
-
             @count = 0
 
             while @count < MAX_COUNT && !finished?
@@ -44,7 +42,7 @@ module Flowerbox
         <<-HTML
 <html>
   <head>
-    <title>Flowerbox - Selenium Runner</title>
+    <title>Flowerbox - #{Flowerbox.test_environment.name} Runner</title>
     <script type="text/javascript">
 console._log = console.log;
 
@@ -56,9 +54,11 @@ console.log = function(msg) {
     #{template_files.join("\n")}
   </head>
   <body>
-    <h1>Flowerbox - Selenium Runner</h1>
+    <h1>Flowerbox - #{Flowerbox.test_environment.name} Runner</h1>
     <script type="text/javascript">
       Flowerbox.environment = '#{browser}';
+
+      var context = this;
 
       #{env}
     </script>

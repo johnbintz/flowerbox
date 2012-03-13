@@ -2,6 +2,19 @@ Flowerbox ||= {}
 Flowerbox.Cucumber ||= {}
 
 class Flowerbox.Cucumber.Reporter
+  nameParts: ->
+    [ @feature.getName(), @scenario.getName(), "#{this.type()} #{@step.getName()}" ]
+
+  type: ->
+    type = "Given"
+
+    if @step.isOutcomeStep()
+      type = "Then"
+    else if @step.isEventStep()
+      type = "When"
+
+    type
+
   hear: (event, callback) ->
     switch event.getName()
       when 'BeforeFeatures'
@@ -26,40 +39,27 @@ class Flowerbox.Cucumber.Reporter
       when 'StepResult'
         stepResult = event.getPayloadItem('stepResult')
 
-        type = "Given"
-
-        if @step.isOutcomeStep()
-          type = "Then"
-        else if @step.isEventStep()
-          type = "When"
-
         file = Flowerbox.Step.matchFile(@step.getName()) || "unknown:0"
 
-        test = { passed_: false, message: 'skipped', splitName: [ @feature.getName(), @scenario.getName(), "#{type} #{@step.getName()}" ], trace: { stack: [ file ] } }
+        result = new Flowerbox.Result(step_type: this.type(), source: 'cucumber', original_name: @step.getName(), name: this.nameParts(), file: file)
 
         if stepResult.isSuccessful()
-          test.passed_ = true
+          result.status = Flowerbox.Result.SUCCESS
         else if stepResult.isPending()
-          test.message = "pending"
+          result.status = Flowerbox.Result.PENDING
         else if stepResult.isUndefined()
-          regexp = @step.getName()
-          regexp = regexp.replace(/"[^"]+"/g, '"([^"]+)"')
-
-          test.message = """
-                         Step not defined. Define it with the following:
-
-                         Flowerbox.#{type} /^#{regexp}$/, ->
-                           @pending()
-
-
-                         """
+          result.status = Flowerbox.Result.UNDEFINED
         else if stepResult.isFailed()
+          result.status = Flowerbox.Result.FAILURE
+
           error = stepResult.getFailureException()
+          stack = (error.stack || "message\n#{file}:0").split("\n")
 
-          test.message = error.message
-          test.trace.stack = [ 'file:1' ]
+          failure = { runner: Flowerbox.environment, message: error.message, stack: stack }
 
-        Flowerbox.contact("finish_test", @step.getName(), [ { items_: [ test ] } ])
+          result.failures.push(failure)
+
+        Flowerbox.contact("finish_test", result.toJSON())
 
     callback()
 

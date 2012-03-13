@@ -5,26 +5,25 @@ module Flowerbox
     attr_accessor :time
 
     def self.from_results(results, options)
-      results = results['items_'].collect do |result|
-        if name = result['splitName']
-          case result['passed_']
-          when true
-            Success.new(name, result['message'])
-          else
-            Failure.new(name, result['message'], result['trace']['stack'].first)
-          end
+      results = results.collect do |result|
+        result['runner'] = options[:runner]
+
+        if name = result['name']
+          Flowerbox::Result.for(result['source'], result['status']).new(result)
         else
-          Exception.new(result.first['trace']['stack'])
+          Flowerbox::Result::Exception.new(result)
         end
       end.flatten
-
-      results.each { |result| result.runners << options[:runner] }
 
       new(results, options)
     end
 
     def self.for(runner)
       new(results, :runner => runner)
+    end
+
+    def reporters
+      Flowerbox.reporters
     end
 
     def initialize(results = [], options = {})
@@ -34,7 +33,7 @@ module Flowerbox
     def <<(other)
       other.results.each do |other_result|
         if existing_result = results.find { |result| result == other_result }
-          existing_result.runners << other_result.runners
+          existing_result << other_result
         else
           results << other_result
         end
@@ -45,10 +44,8 @@ module Flowerbox
       @results.empty? ? 0 : 1
     end
 
-    def print
-      gathered_results.each(&:print)
-
-      puts "#{total_tests} total, #{total_failures} failures, #{time} secs."
+    def print(data = {})
+      reporters.each { |reporter| reporter.report(flattened_gathered_results, data) }
     end
 
     def total_tests
@@ -60,7 +57,9 @@ module Flowerbox
     end
 
     def print_progress
-      @results.each { |result| result.print_progress ; $stdout.flush }
+      @results.each do |result|
+        reporters.each { |reporter| reporter.report_progress(result) }
+      end
     end
 
     def gathered_results
@@ -69,21 +68,20 @@ module Flowerbox
       @gathered_results = []
 
       results.each do |result|
-        case result
-        when Flowerbox::Exception
-          @gathered_results << result
-        when Flowerbox::Failure
-          if !(gathered_result = @gathered_results.find { |g| g.name == result.name })
-            gathered_result = GatheredResult.new(result.name)
+        if !(gathered_result = @gathered_results.find { |g| g.name == result.name })
+          gathered_result = GatheredResult.new(result.name)
 
-            @gathered_results << gathered_result
-          end
-
-          gathered_result << result
+          @gathered_results << gathered_result
         end
+
+        gathered_result << result
       end
 
       @gathered_results
+    end
+
+    def flattened_gathered_results
+      gathered_results.collect(&:results).flatten
     end
   end
 end

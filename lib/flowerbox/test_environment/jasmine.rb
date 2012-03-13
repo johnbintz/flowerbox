@@ -25,17 +25,8 @@ if (typeof context != 'undefined' && typeof jasmine == 'undefined') {
 }
 
 jasmine.getEnv().addReporter(new jasmine.FlowerboxReporter());
-#{jasmine_reporters.join("\n")}
 jasmine.getEnv().execute();
 JS
-      end
-
-      def jasmine_reporters
-        reporters.collect { |reporter| %{jasmine.getEnv().addReporter(new jasmine.#{reporter}());} }
-      end
-
-      def reporters
-        @reporters ||= []
       end
     end
   end

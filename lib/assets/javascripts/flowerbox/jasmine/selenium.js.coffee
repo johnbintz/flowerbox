@@ -7,9 +7,9 @@ jasmine.Spec.beforeAddMatcherResult().push ->
       if e.stack
         file = switch Flowerbox.environment
           when 'firefox'
-            e.stack.split("\n")[3].replace(/^[^@]*@/, '')
+            e.stack.split("\n")[3]
           when 'chrome'
-            e.stack.split("\n")[4].replace(/^.*\((.*)\)$/, '$1').replace(/:[^:]+$/, '')
+            e.stack.split("\n")[4]
 
-        @trace = { stack: [ file.replace(/^.*__F__/, '') ] }
+        @trace = { stack: [ file ] }
 

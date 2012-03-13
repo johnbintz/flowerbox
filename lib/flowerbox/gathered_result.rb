@@ -25,16 +25,6 @@ module Flowerbox
     def success?
       @results.all?(&:success?)
     end
-
-    def print
-      puts name.join(' ')
-
-      results.each do |result|
-        puts "  #{result}"
-      end
-
-      puts
-    end
   end
 end
 

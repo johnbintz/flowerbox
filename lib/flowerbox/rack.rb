@@ -33,11 +33,15 @@ module Flowerbox
     end
 
     empty_post '/finish_test' do
-      runner.add_results(data.flatten[1..-1])
+      runner.add_results(data.flatten)
     end
 
     empty_post '/log' do
       runner.log(data.first)
+    end
+
+    empty_post '/ping' do
+      runner.ping
     end
 
     get %r{^/__F__(/.*)$} do |file|

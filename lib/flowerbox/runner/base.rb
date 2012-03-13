@@ -1,16 +1,27 @@
 module Flowerbox
   module Runner
     class Base
-      attr_reader :sprockets, :spec_files, :options
+      attr_reader :sprockets, :spec_files, :options, :time
 
       attr_accessor :results
+
+      MAX_COUNT = 30
 
       def initialize
         @results = ResultSet.new
       end
 
+      def ensure_alive
+        while @count < MAX_COUNT && !finished?
+          @count += 1
+          sleep 0.1
+        end
+      end
+
       def run(sprockets, spec_files, options)
         @sprockets, @spec_files, @options = sprockets, spec_files, options
+
+        @count = 0
 
         puts "Flowerbox running your #{Flowerbox.test_environment.name} tests on #{console_name}..."
 
@@ -19,9 +30,6 @@ module Flowerbox
         yield
 
         server.stop
-
-        puts
-        puts
 
         @results
       end
@@ -56,7 +64,7 @@ module Flowerbox
         return @server if @server
 
         server_options = { :app => Flowerbox::Rack }
-        server_options[:logging] = true if options[:verbose]
+        server_options[:logging] = true if options[:verbose_server]
 
         @server = Flowerbox::Delivery::Server.new(server_options)
         Flowerbox::Rack.runner = self
@@ -74,6 +82,8 @@ module Flowerbox
 
       def add_tests(new_tests)
         tests << new_tests
+
+        @count = 0
       end
 
       def failures
@@ -96,6 +106,10 @@ module Flowerbox
         @failures.length
       end
 
+      def time
+        @time ||= 0
+      end
+
       def finish!(time)
         @time = time
 
@@ -106,9 +120,13 @@ module Flowerbox
         @finished
       end
 
+      def ping
+        @count = 0
+      end
+
       private
       def result_set_from_test_results(test_results)
-        ResultSet.from_results(test_results.first, options.merge(:runner => name))
+        ResultSet.from_results(test_results, options.merge(:runner => name))
       end
     end
   end

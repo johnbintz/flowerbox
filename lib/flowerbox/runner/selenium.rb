@@ -3,7 +3,6 @@ require 'selenium-webdriver'
 module Flowerbox
   module Runner
     class Selenium < Base
-      MAX_COUNT = 30
 
       def name
         raise StandardError.new("Override me")
@@ -20,12 +19,7 @@ module Flowerbox
 
             selenium.navigate.to "http://localhost:#{server.port}/"
 
-            @count = 0
-
-            while @count < MAX_COUNT && !finished?
-              @count += 1
-              sleep 0.1
-            end
+            ensure_alive
           ensure
             selenium.quit if selenium
           end
@@ -60,7 +54,9 @@ console.log = function(msg) {
 
       var context = this;
 
-      #{env}
+      window.onload = function() {
+        #{env}
+      };
     </script>
   </body>
 </html>
@@ -69,12 +65,6 @@ HTML
 
       def template_files
         sprockets.files.collect { |file| %{<script type="text/javascript" src="/__F__#{file}"></script>} }
-      end
-
-      def add_failures(data)
-        super
-
-        @count = 0
       end
     end
   end

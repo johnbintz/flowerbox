@@ -1,8 +1,10 @@
 module Flowerbox
   module TestEnvironment
+    extend Flowerbox::CoreExt::Module
+
     class << self
       def for(env)
-        self.const_get(self.constants.find { |c| c.to_s.downcase.to_s == env.to_s }).new
+        find_constant(env).new
       end
     end
   end

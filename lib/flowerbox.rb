@@ -3,6 +3,10 @@ require 'flowerbox-delivery'
 require 'rainbow'
 
 module Flowerbox
+  module CoreExt
+    autoload :Module, 'flowerbox/core_ext/module'
+  end
+
   autoload :Runner, 'flowerbox/runner'
 
   module Runner
@@ -26,12 +30,19 @@ module Flowerbox
   autoload :ResultSet, 'flowerbox/result_set'
   autoload :GatheredResult, 'flowerbox/gathered_result'
   autoload :Result, 'flowerbox/result'
-  autoload :BaseResult, 'flowerbox/base_result'
-  autoload :Success, 'flowerbox/success'
-  autoload :Failure, 'flowerbox/failure'
-  autoload :Exception, 'flowerbox/exception'
+
+  autoload :Reporter, 'flowerbox/reporter'
 
   class << self
+    attr_writer :reporters
+
+    def reset!
+      @spec_patterns = nil
+      @spec_files = nil
+      @asset_paths = nil
+      @reporters = nil
+    end
+
     def spec_patterns
       @spec_patterns ||= []
     end
@@ -40,12 +51,20 @@ module Flowerbox
       @asset_paths ||= []
     end
 
+    def reporters
+      @reporters ||= []
+    end
+
     def test_with(what)
       self.test_environment = Flowerbox::TestEnvironment.for(what)
     end
 
     def run_with(*whats)
       self.runner_environment = whats.flatten.collect { |what| Flowerbox::Runner.for(what.to_s) }
+    end
+
+    def report_with(*whats)
+      self.reporters = whats.flatten.collect { |what| Flowerbox::Reporter.for(what.to_s) }
     end
 
     def path
@@ -61,6 +80,10 @@ module Flowerbox
         spec_patterns << "**/*_spec*"
         spec_patterns << "*/*_spec*"
       end
+
+      if reporters.empty?
+        reporters << Flowerbox::Reporter.for(:progress)
+      end
     end
 
     def bare_coffeescript
@@ -68,6 +91,8 @@ module Flowerbox
     end
 
     def run(dir, options = {})
+      reset!
+
       load File.join(dir, 'spec_helper.rb')
 
       if options[:runners]
@@ -81,13 +106,18 @@ module Flowerbox
 
       result_set = ResultSet.new
 
+      time = 0
+      realtime = Time.now.to_i
+
       Flowerbox.runner_environment.each do |env|
         env.ensure_configured!
 
         result_set << env.run(build_sprockets_for(dir), spec_files_for(dir), options)
+
+        time += env.time
       end
 
-      result_set.print
+      result_set.print(:time => time, :realtime => Time.now.to_i - realtime)
       result_set.exitstatus
     end
 
@@ -116,7 +146,7 @@ module Flowerbox
 
       Flowerbox.spec_patterns.each do |pattern|
         Dir[File.join(dir, pattern)].each do |file|
-          @spec_files << file.gsub(dir + '/', '')
+          @spec_files << File.expand_path(file)
         end
       end
 

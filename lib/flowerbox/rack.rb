@@ -5,11 +5,15 @@ require 'cgi'
 module Flowerbox
   class Rack < Sinatra::Base
     class << self
-      attr_accessor :runner
+      attr_accessor :runner, :sprockets
     end
 
     def runner
       self.class.runner
+    end
+
+    def sprockets
+      self.class.sprockets
     end
 
     def data
@@ -44,11 +48,16 @@ module Flowerbox
       runner.ping
     end
 
-    get %r{^/__F__(/.*)$} do |file|
-      File.read(file)
+    get %r{^/__F__/(.*)$} do |file|
+      asset = sprockets.asset_for(file, :bundle => false)
+
+      content_type asset.content_type
+      asset.body
     end
 
     get '/' do
+      sprockets.expire_index!
+
       runner.template
     end
   end

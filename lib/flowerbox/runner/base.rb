@@ -18,8 +18,12 @@ module Flowerbox
         end
       end
 
-      def run(sprockets, spec_files, options)
+      def setup(sprockets, spec_files, options)
         @sprockets, @spec_files, @options = sprockets, spec_files, options
+      end
+
+      def run(*args)
+        setup(*args)
 
         @count = 0
 
@@ -39,6 +43,10 @@ module Flowerbox
       end
 
       def configure
+      end
+
+      def debug?
+        options[:debug] == true
       end
 
       def ensure_configured!
@@ -65,9 +73,11 @@ module Flowerbox
 
         server_options = { :app => Flowerbox::Rack }
         server_options[:logging] = true if options[:verbose_server]
+        server_options[:port] = Flowerbox.port
 
         @server = Flowerbox::Delivery::Server.new(server_options)
         Flowerbox::Rack.runner = self
+        Flowerbox::Rack.sprockets = @sprockets
 
         @server
       end

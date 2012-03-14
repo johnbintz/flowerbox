@@ -8,7 +8,7 @@ class Flowerbox::Runner::Firefox < Flowerbox::Runner::Selenium
   end
 
   def browser
-    :firefox
+    @browser ||= ::Selenium::WebDriver.for(:firefox)
   end
 end
 

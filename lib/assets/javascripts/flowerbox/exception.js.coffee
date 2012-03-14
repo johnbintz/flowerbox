@@ -1,5 +1,5 @@
 class Flowerbox.Exception
-  constructor: (@stack) ->
+  constructor: (@source, @name, @stack) ->
 
   toJSON: ->
-    { trace: { stack: @stack } }
+    { status: Flowerbox.Result.FAILURE, source: @source, name: @name, trace: { stack: @stack } }

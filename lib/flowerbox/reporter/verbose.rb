@@ -9,22 +9,26 @@ module Flowerbox::Reporter
     end
 
     def report_progress(result)
-      result.name.each_with_index do |name, index|
-        if @name_stack[index] != name
-          if name != result.name.last
-            message = name
-          else
-            message = self.send("progress_#{result.type}", result)
-            if !(file_display = path_for(result)).empty?
-              message << " # #{file_display}"
+      if result.name
+        result.name.each_with_index do |name, index|
+          if @name_stack[index] != name
+            if name != result.name.last
+              message = name
+            else
+              message = self.send("progress_#{result.type}", result)
+              if !(file_display = path_for(result)).empty?
+                message << " # #{file_display}"
+              end
             end
+
+            puts indent(message, index)
           end
-
-          puts indent(message, index)
         end
-      end
 
-      @name_stack = result.name.dup
+        @name_stack = result.name.dup
+      else
+        puts result.data
+      end
     end
 
     def progress_skipped(result)

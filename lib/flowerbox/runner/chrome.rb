@@ -13,7 +13,7 @@ class Flowerbox::Runner::Chrome < Flowerbox::Runner::Selenium
   end
 
   def browser
-    :chrome
+    @browser ||= ::Selenium::WebDriver.for(:chrome)
   end
 end
 

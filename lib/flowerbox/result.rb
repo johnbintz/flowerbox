@@ -11,6 +11,7 @@ module Flowerbox
     end
 
     autoload :Base, 'flowerbox/result/base'
+    autoload :Exception, 'flowerbox/result/exception'
     autoload :Failure, 'flowerbox/result/failure'
     autoload :Pending, 'flowerbox/result/pending'
     autoload :FailureMessage, 'flowerbox/result/failure_message'

@@ -1,5 +1,8 @@
 #= require flowerbox/jasmine/reporter
 
+# because why not?
+@context = @describe
+
 getSplitName = (parts) ->
   parts.push(String(@description).replace(/[\n\r]/g, ' '))
   parts

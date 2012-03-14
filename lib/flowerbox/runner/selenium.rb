@@ -3,7 +3,6 @@ require 'selenium-webdriver'
 module Flowerbox
   module Runner
     class Selenium < Base
-
       def name
         raise StandardError.new("Override me")
       end
@@ -12,17 +11,19 @@ module Flowerbox
         :selenium
       end
 
+      def cleanup
+        @browser.close if @browser
+      end
+
+      def browser
+        raise StandardError.new("Define a browser")
+      end
+
       def run(sprockets, spec_files, options)
         super do
-          begin
-            selenium = ::Selenium::WebDriver.for(browser)
+          browser.navigate.to "http://localhost:#{server.port}/"
 
-            selenium.navigate.to "http://localhost:#{server.port}/"
-
-            ensure_alive
-          ensure
-            selenium.quit if selenium
-          end
+          ensure_alive
         end
       end
 
@@ -50,13 +51,13 @@ console.log = function(msg) {
   <body>
     <h1>Flowerbox - #{Flowerbox.test_environment.name} Runner</h1>
     <script type="text/javascript">
-      Flowerbox.environment = '#{browser}';
+      Flowerbox.environment = '#{name}';
 
       var context = this;
 
-      window.onload = function() {
+      window.addEventListener('DOMContentLoaded', function() {
         #{env}
-      };
+      }, false);
     </script>
   </body>
 </html>
@@ -64,7 +65,7 @@ HTML
       end
 
       def template_files
-        sprockets.files.collect { |file| %{<script type="text/javascript" src="/__F__#{file}"></script>} }
+        sprockets.files.collect { |file| %{<script type="text/javascript" src="/__F__/#{file.logical_path}"></script>} }
       end
     end
   end

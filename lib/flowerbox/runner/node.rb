@@ -26,6 +26,8 @@ module Flowerbox
         File.directory?(File.join(Dir.pwd, 'node_modules/cucumber'))
       end
 
+      def cleanup ; end
+
       def configure
         system %{bash -c "mkdir -p node_modules && npm link jsdom && npm link xmlhttprequest && npm link cucumber"}
       end
@@ -73,7 +75,7 @@ jsdom.env(
       var options = {
         host: "localhost",
         port: #{server.port},
-        path: "/__F__" + file,
+        path: "/__F__/" + file,
         method: "GET"
       };
 

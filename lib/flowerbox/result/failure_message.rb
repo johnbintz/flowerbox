@@ -13,7 +13,7 @@ module Flowerbox::Result
     end
 
     def file
-      first_local_stack[%r{(#{Dir.pwd}.*$)}, 1]
+      first_local_stack[%r{__F__/(.*)$}, 1]
     end
 
     def runner
@@ -25,7 +25,7 @@ module Flowerbox::Result
     end
 
     def first_local_stack
-      @data['stack'].find { |line| line[File.join(".tmp/sprockets", Dir.pwd)] } || @data['stack'][1]
+      @data['stack'].find { |line| line['__F__'] } || @data['stack'][1]
     end
   end
 end

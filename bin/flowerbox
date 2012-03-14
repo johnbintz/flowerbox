@@ -4,16 +4,16 @@ require 'flowerbox'
 require 'thor'
 
 class Flowerbox::CLI < Thor
-  desc "test DIR", "Run the specs found in spec dir, loading spec_helper.rb for configuration details"
-  method_options :pwd => :string, :runners => :string, :runner => :string, :verbose_server => false
-  def test(dir = "spec/javascripts")
+  desc "test DIR FILES...", "Run the specs found in spec dir, loading spec_helper.rb for configuration details"
+  method_options :pwd => :string, :env_options => nil, :runners => :string, :runner => :string, :verbose_server => false
+  def test(dir = "spec/javascripts", *files)
     Dir.chdir(pwd) do
-      exit Flowerbox.run(dir, options.dup)
+      exit Flowerbox.run(dir, options.dup.merge(:files => files))
     end
   end
 
   desc "debug DIR", "Start the Flowerbox server to help debug loading issues."
-  method_options :pwd => :string, :runners => :string, :runner => :string, :verbose_server => false
+  method_options :pwd => :string, :env_options => nil, :runners => :string, :runner => :string, :verbose_server => false
   def debug(dir = "spec/javascripts")
     Dir.chdir(pwd) do
       Flowerbox.debug(dir, options.dup)

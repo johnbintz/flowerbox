@@ -41,7 +41,7 @@ module Flowerbox
     end
 
     def exitstatus
-      @results.empty? ? 0 : 1
+      results.any?(&:failure?) ? 1 : 0
     end
 
     def print(data = {})

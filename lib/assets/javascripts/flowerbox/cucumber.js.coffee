@@ -17,14 +17,20 @@ Flowerbox.World = (code = null) ->
 Flowerbox.Matchers =
   toEqual: (expected) ->
     @message = "Expected #{@actual} #{@notMessage} equal #{expected}"
-    @actual == expected
+    if typeof @actual == 'object'
+      for key, value of @actual
+        return false if expected[key] != value
+
+      for key, value of expected
+        return false if @actual[key] != value
+
+      true
+    else
+      @actual == expected
 
 Flowerbox.World ->
   @assert = (what, message = 'failed') ->
     throw new Error(message) if !what
-
-  @_pending = false
-  @pending = -> @_pending = true
 
   @expect = (what) -> new Flowerbox.Matcher(what)
 
@@ -32,6 +38,20 @@ Flowerbox.World ->
 
   Flowerbox.Matcher.matchers = {}
   @addMatchers(Flowerbox.Matchers)
+
+  if Flowerbox.Cucumber.tags
+    negatedTags = []
+    for tagSet in Flowerbox.Cucumber.tags
+      tags = for tag in tagSet.split(',')
+        if tag.substr(0, 1) == '@'
+          "~" + tag
+        else
+          tag.substr(1)
+
+      negatedTags.push(tags)
+
+    @around (negatedTags..., runScenario) ->
+      
 
 class Flowerbox.Matcher
   @addMatchers: (data) ->
@@ -62,12 +82,15 @@ Flowerbox.Step = (type, match, code) ->
   Flowerbox.World.Code ||= []
   Flowerbox.World.Code.push (args..., callback) ->
     this[type] match, (args..., callback) =>
+      _pending = false
+      @pending = -> _pending = true
+
       result = code.apply(this, args)
 
       if result? and result.__prototype__ == Error
         callback.fail(result)
       else
-        if @_pending then callback.pending("pending") else callback()
+        if _pending then callback.pending("pending") else callback()
 
       null
 

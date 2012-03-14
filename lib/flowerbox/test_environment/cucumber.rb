@@ -1,6 +1,14 @@
 module Flowerbox
   module TestEnvironment
     class Cucumber < Base
+      def initialize
+        @step_language = nil
+      end
+      
+      def prefer_step_language(language)
+        @step_language = language
+      end
+
       def inject_into(sprockets)
         @sprockets = sprockets
 
@@ -20,10 +28,17 @@ module Flowerbox
         <<-JS
 context.Cucumber = context.require('./cucumber');
 
-context.cucumber = context.Cucumber(context.Flowerbox.Cucumber.features(), context.Flowerbox.World());
+options = {}
+#{maybe_tags}
+
+context.cucumber = context.Cucumber(context.Flowerbox.Cucumber.features(), context.Flowerbox.World(), options);
 context.cucumber.attachListener(new context.Flowerbox.Cucumber.Reporter());
 context.cucumber.start(function() {});
 JS
+      end
+
+      def maybe_tags
+        "options.tags = #{@options[:tags].to_json};" if @options[:tags]
       end
 
       def obtain_test_definition_for(result)
@@ -57,6 +72,8 @@ JS
       end
 
       def primarily_coffeescript?
+        return true if @step_language == :coffeescript
+
         coffee_count = @runner.spec_files.inject(0) { |s, n| s += 1 if n[%r{.coffee$}]; s }
         js_count = @runner.spec_files.inject(0) { |s, n| s += 1 if n[%r{.js$}]; s }
 

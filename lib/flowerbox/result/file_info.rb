@@ -26,7 +26,7 @@ module Flowerbox::Result::FileInfo
   alias :line :line_number
 
   def translated_file_and_line
-    "#{translated_file.gsub(Dir.pwd + '/', '')}:#{line_number}"
+    "#{translated_file.gsub(%r{^/}, '')}:#{line_number}"
   end
 end
 

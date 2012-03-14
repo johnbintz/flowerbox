@@ -5,7 +5,7 @@ jasmine.Spec.beforeAddMatcherResult().push ->
 
     errorInfo = new Error().stack[3]
 
-    @trace = { stack: [ "#{errorInfo.getFileName()}:#{errorInfo.getLineNumber()}" ] }
+    @trace = { stack: "#{errorInfo.getFileName()}:#{errorInfo.getLineNumber()}" }
 
     Error.prepareStackTrace = Error.prepareStackTrace_
 

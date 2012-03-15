@@ -7,11 +7,13 @@ module Flowerbox::Run
 
       time = 0
       realtime = Time.now.to_i
+      failed = false
 
       runner_envs = Flowerbox.runner_environment.collect do |env|
         env.ensure_configured!
 
         result_set << env.run(sprockets, spec_files, options)
+        failed = true if !env.started?
 
         time += env.time
 
@@ -22,7 +24,7 @@ module Flowerbox::Run
 
       runner_envs.each(&:cleanup)
 
-      result_set.exitstatus
+      failed ? 1 : result_set.exitstatus
     rescue Flowerbox::Runner::Base::RunnerDiedError
       255
     end

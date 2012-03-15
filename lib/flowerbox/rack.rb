@@ -60,7 +60,7 @@ module Flowerbox
     end
 
     command :starting do
-
+      runner.did_start!
     end
 
     get %r{^/__F__/(.*)$} do |file|

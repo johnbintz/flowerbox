@@ -11,6 +11,11 @@ module Flowerbox
 
       def initialize
         @results = ResultSet.new
+        @started = false
+      end
+
+      def started?
+        @started
       end
 
       def ensure_alive
@@ -88,6 +93,10 @@ module Flowerbox
 
       def time=(time)
         @results.time = time
+      end
+
+      def did_start!
+        @started = true
       end
 
       def server

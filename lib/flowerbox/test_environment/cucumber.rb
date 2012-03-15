@@ -4,26 +4,27 @@ module Flowerbox
       def initialize
         @step_language = nil
       end
-      
+
       def prefer_step_language(language)
         @step_language = language
       end
 
       def inject_into(sprockets)
-        @sprockets = sprockets
+        super
 
         @sprockets.register_engine('.feature', Flowerbox::Delivery::Tilt::FeatureTemplate)
-
-        @sprockets.add('cucumber.js')
       end
 
-      def start_for(runner)
-        @runner = runner
+      def global_system_files
+        %w{cucumber.js flowerbox/cucumber}
+      end
 
-        @sprockets.add("flowerbox/cucumber")
-        @sprockets.add("flowerbox/cucumber/#{runner.type}")
+      def runner_system_files
+        [ "flowerbox/cucumber/#{@runner.type}" ]
+      end
 
-        @runner.spec_files.each { |file| @sprockets.add(file) }
+      def start
+        super
 
         <<-JS
 context.Cucumber = context.require('./cucumber');

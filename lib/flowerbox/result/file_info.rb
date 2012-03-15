@@ -28,5 +28,9 @@ module Flowerbox::Result::FileInfo
   def translated_file_and_line
     "#{translated_file.gsub(%r{^/}, '')}:#{line_number}"
   end
+
+  def system_files
+    Flowerbox.test_environment.system_files
+  end
 end
 

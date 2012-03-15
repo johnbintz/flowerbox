@@ -28,11 +28,12 @@ module Flowerbox::Run
         Flowerbox.run_with(runners.split(','))
       end
 
+      Flowerbox.test_environment.run = self
       Flowerbox.test_environment.set_additional_options(options[:env_options])
     end
 
     def sprockets
-      sprockets = Flowerbox::Delivery::SprocketsHandler.new(
+      Flowerbox::Delivery::SprocketsHandler.new(
         :asset_paths => [
           Flowerbox.path.join("lib/assets/javascripts"),
           Flowerbox.path.join("vendor/assets/javascripts"),
@@ -40,15 +41,6 @@ module Flowerbox::Run
           Flowerbox.asset_paths
         ].flatten
       )
-
-      sprockets.add('flowerbox')
-      sprockets.add('json2')
-
-      Flowerbox.test_environment.inject_into(sprockets)
-
-      Flowerbox.additional_files.each { |file| sprockets.add(file) }
-
-      sprockets
     end
 
     def spec_files
@@ -73,6 +65,10 @@ module Flowerbox::Run
       @only = options[:files] || []
       @only = nil if only.empty?
       @only
+    end
+
+    def system_files
+      %w{flowerbox json2}
     end
   end
 end

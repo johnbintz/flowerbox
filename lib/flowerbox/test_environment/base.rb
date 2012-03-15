@@ -3,6 +3,8 @@ require 'yaml'
 module Flowerbox
   module TestEnvironment
     class Base
+      attr_accessor :runner, :run
+
       def name
         self.class.name.split("::").last
       end
@@ -24,6 +26,20 @@ module Flowerbox
 
           @options[:tags] = [ @options[:tags] ].flatten(1) if @options[:tags]
         end
+      end
+
+      def inject_into(sprockets)
+        @sprockets = sprockets
+
+        system_files.each { |file| @sprockets.add(file) }
+      end
+
+      def system_files
+        run.system_files + global_system_files + runner_system_files
+      end
+
+      def start
+        runner.spec_files.each { |file| @sprockets.add(file) }
       end
     end
   end

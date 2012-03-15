@@ -3,21 +3,22 @@ require 'jasmine-core'
 module Flowerbox
   module TestEnvironment
     class Jasmine < Base
-
       def inject_into(sprockets)
-        @sprockets = sprockets
+        sprockets.append_path(::Jasmine::Core.path)
 
-        @sprockets.append_path(::Jasmine::Core.path)
-
-        @sprockets.add('jasmine.js')
-        @sprockets.add('jasmine-html.js')
+        super
       end
 
-      def start_for(runner)
-        @sprockets.add("flowerbox/jasmine.js")
-        @sprockets.add("flowerbox/jasmine/#{runner.type}.js")
+      def global_system_files
+        %w{jasmine.js flowerbox/jasmine.js}
+      end
 
-        runner.spec_files.each { |file| @sprockets.add(file) }
+      def runner_system_files
+        [ "flowerbox/jasmine/#{@runner.type}.js" ]
+      end
+
+      def start
+        super
 
         <<-JS
 if (typeof context != 'undefined' && typeof jasmine == 'undefined') {

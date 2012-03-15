@@ -39,20 +39,6 @@ Flowerbox.World ->
   Flowerbox.Matcher.matchers = {}
   @addMatchers(Flowerbox.Matchers)
 
-  if Flowerbox.Cucumber.tags
-    negatedTags = []
-    for tagSet in Flowerbox.Cucumber.tags
-      tags = for tag in tagSet.split(',')
-        if tag.substr(0, 1) == '@'
-          "~" + tag
-        else
-          tag.substr(1)
-
-      negatedTags.push(tags)
-
-    @around (negatedTags..., runScenario) ->
-      
-
 class Flowerbox.Matcher
   @addMatchers: (data) ->
     for method, code of data
@@ -106,15 +92,20 @@ Flowerbox.Step.matchFile = (name) ->
 stepGenerator = (type) ->
   Flowerbox[type] = (match, code) ->
     if !Flowerbox.Step.files[match.toString()]
-      count = 2
+      nextLine = false
       if stack = (new Error()).stack
         for line in stack.split('\n')
-          if line.match(/__F__/)
-            count -= 1
+          if nextLine
+            result = if line.match(/__F__/)
+              line.replace(/^.*__F__\/([^:]+:\d+).*$/, '$1')
+            else
+              line.replace(/^.*(\(| )([^:]+:\d+).*$/, '$2')
 
-            if count == 0
-              Flowerbox.Step.files[match.toString()] = [ match, line.replace(/^.*__F__/, '') ]
-              break
+            Flowerbox.Step.files[match.toString()] = [ match, result ]
+            break
+
+          if line.match(/(Given|When|Then)/)
+            nextLine = true
 
     Flowerbox.Step(type, match, code)
 

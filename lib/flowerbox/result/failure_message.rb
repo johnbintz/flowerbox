@@ -13,7 +13,7 @@ module Flowerbox::Result
     end
 
     def file
-      first_local_stack[%r{__F__/(.*)$}, 1]
+      first_local_stack[%r{\(([^:]+\:\d+)}, 1]
     end
 
     def runner
@@ -25,7 +25,9 @@ module Flowerbox::Result
     end
 
     def first_local_stack
-      @data['stack'].find { |line| line['__F__'] } || @data['stack'][1]
+      @data['stack'][1..-1].find do |line|
+        !system_files.any? { |file| line[%r{\(#{file}}] }
+      end || @data['stack'][1]
     end
   end
 end

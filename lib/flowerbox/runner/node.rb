@@ -107,6 +107,12 @@ jsdom.env(
       request.end();
     } else {
       #{env}
+
+      var waitForFinish;
+      waitForFinish = function() {
+        if (context.Flowerbox.working) { process.nextTick(waitForFinish); }
+      };
+      waitForFinish();
     }
   };
   fileRunner();

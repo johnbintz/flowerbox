@@ -20,6 +20,10 @@ module Flowerbox
 
       def setup(sprockets, spec_files, options)
         @sprockets, @spec_files, @options = sprockets, spec_files, options
+
+        Flowerbox.test_environment.runner = self
+        Flowerbox.test_environment.inject_into(sprockets)
+        Flowerbox.additional_files.each { |file| sprockets.add(file) }
       end
 
       def run(*args)
@@ -61,7 +65,7 @@ module Flowerbox
       end
 
       def start_test_environment
-        Flowerbox.test_environment.start_for(self)
+        Flowerbox.test_environment.start
       end
 
       def time=(time)

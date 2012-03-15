@@ -7,25 +7,33 @@ Flowerbox =
   debug: false
   ping: ->
     Flowerbox.contact('ping')
+  working: false
 
   contact: (url, data...) ->
     if !Flowerbox.debug
-      attempts = 3
+      Flowerbox.contactQueue ||= []
 
-      doContact = ->
-        attempts -= 1
+      Flowerbox.contactQueue.push([url, data])
+      Flowerbox.workOffQueue()
 
-        try
-          xhr = new XMLHttpRequest()
-          xhr.open("POST", Flowerbox.baseUrl + url, false)
-          xhr.setRequestHeader("Accept", "application/json")
-          xhr.send(JSON.stringify(data))
-        catch e
-          if attempts == 0
-            throw e
-          else
-            doContact()
+  workOffQueue: ->
+    if !Flowerbox.working
+      Flowerbox.working = true
+      Flowerbox.doWorkOffQueue()
 
-      doContact()
+  doWorkOffQueue: ->
+    if Flowerbox.contactQueue.length > 0
+      [ url, data ] = Flowerbox.contactQueue.shift()
+
+      xhr = new XMLHttpRequest()
+      xhr.open("POST", Flowerbox.baseUrl + url, true)
+      xhr.setRequestHeader("Accept", "application/json")
+      xhr.onreadystatechange = ->
+        if @readyState == @DONE
+          Flowerbox.doWorkOffQueue()
+      xhr.send(JSON.stringify(data))
+    else
+      Flowerbox.working = false
+
   fail: ->
 

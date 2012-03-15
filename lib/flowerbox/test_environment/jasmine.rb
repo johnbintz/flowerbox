@@ -26,6 +26,7 @@ if (typeof context != 'undefined' && typeof jasmine == 'undefined') {
 }
 
 jasmine.getEnv().addReporter(new jasmine.FlowerboxReporter());
+
 jasmine.getEnv().execute();
 JS
       end

@@ -20,32 +20,47 @@ module Flowerbox
       JSON.parse(request.body.string)
     end
 
-    def self.empty_post(*args, &block)
-      post(*args) do
+    def self.command(*args, &block)
+      url, args = args
+      url = "/#{url}"
+
+      post(url, *args) do
         instance_eval(&block)
 
         ""
       end
     end
 
-    empty_post '/results' do
+    command :results do
       runner.finish!(data.flatten.first)
     end
 
-    empty_post '/start_test' do
+    command :start_test do
       runner.add_tests(data.flatten)
     end
 
-    empty_post '/finish_test' do
+    command :finish_test do
       runner.add_results(data.flatten)
     end
 
-    empty_post '/log' do
+    command :log do
       runner.log(data.first)
     end
 
-    empty_post '/ping' do
+    command :ping do
       runner.ping
+    end
+
+    command :pause_timer do
+      runner.pause_timer
+    end
+
+    command :unpause_timer do
+      runner.unpause_timer
+    end
+
+    command :starting do
+
     end
 
     get %r{^/__F__/(.*)$} do |file|

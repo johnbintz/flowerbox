@@ -33,3 +33,25 @@ Flowerbox.only = (envs..., code) ->
     if Flowerbox.environment == env
       describe("only in #{envs.join(', ')}", code)
 
+jasmine.WaitsBlock.prototype._execute = jasmine.WaitsBlock.prototype.execute
+jasmine.WaitsForBlock.prototype._execute = jasmine.WaitsForBlock.prototype.execute
+
+pauseAndRun = (onComplete) ->
+  jasmine.getEnv().reporter.reportSpecWaiting()
+
+  this._execute ->
+    jasmine.getEnv().reporter.reportSpecRunning()
+    onComplete()
+
+jasmine.WaitsBlock.prototype.execute = pauseAndRun
+jasmine.WaitsForBlock.prototype.execute = pauseAndRun
+
+for method in [ "reportSpecWaiting", "reportSpecRunning" ]
+  generator = (method) ->
+    (args...) ->
+      for reporter in @subReporters_
+        if reporter[method]?
+          reporter[method](args...)
+
+  jasmine.MultiReporter.prototype[method] = generator(method)
+

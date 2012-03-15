@@ -22,14 +22,13 @@ module Flowerbox
 
       def configured?
         File.directory?(File.join(Dir.pwd, 'node_modules/jsdom')) &&
-        File.directory?(File.join(Dir.pwd, 'node_modules/XMLHttpRequest')) &&
-        File.directory?(File.join(Dir.pwd, 'node_modules/cucumber'))
+        File.directory?(File.join(Dir.pwd, 'node_modules/XMLHttpRequest'))
       end
 
       def cleanup ; end
 
       def configure
-        system %{bash -c "mkdir -p node_modules && npm link jsdom && npm link xmlhttprequest && npm link cucumber"}
+        system %{bash -c "mkdir -p node_modules && npm link jsdom && npm link xmlhttprequest"}
       end
 
       def run(sprockets, spec_files, options)
@@ -108,9 +107,19 @@ jsdom.env(
     } else {
       #{env}
 
+      context.Flowerbox.onQueueStateChange = function(msg) {
+        //console.log(msg);
+      };
+
+      context.Flowerbox.startQueueRunner()
+
       var waitForFinish;
       waitForFinish = function() {
-        if (context.Flowerbox.working) { process.nextTick(waitForFinish); }
+        if (!context.Flowerbox.started || !context.Flowerbox.done) {
+          process.nextTick(waitForFinish);
+        } else {
+          process.exit(0);
+        }
       };
       waitForFinish();
     }

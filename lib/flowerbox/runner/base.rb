@@ -5,7 +5,7 @@ module Flowerbox
 
       attr_accessor :results
 
-      MAX_COUNT = 30
+      MAX_COUNT = 50
 
       def initialize
         @results = ResultSet.new
@@ -13,8 +13,14 @@ module Flowerbox
 
       def ensure_alive
         while @count < MAX_COUNT && !finished?
-          @count += 1
+          @count += 1 if @timer_running
           sleep 0.1
+        end
+
+        if !finished?
+          puts tests.flatten.join("\n").foreground(:red)
+          cleanup
+          exit 1
         end
       end
 
@@ -30,6 +36,7 @@ module Flowerbox
         setup(*args)
 
         @count = 0
+        @timer_running = true
 
         puts "Flowerbox running your #{Flowerbox.test_environment.name} tests on #{console_name}..."
 
@@ -47,6 +54,15 @@ module Flowerbox
       end
 
       def configure
+      end
+
+      def pause_timer
+        @timer_running = false
+        @count = 0
+      end
+
+      def unpause_timer
+        @timer_running = true
       end
 
       def debug?
@@ -97,6 +113,8 @@ module Flowerbox
       def add_tests(new_tests)
         tests << new_tests
 
+        puts new_tests.flatten if options[:verbose_server]
+
         @count = 0
       end
 
@@ -108,6 +126,8 @@ module Flowerbox
         results = result_set_from_test_results(test_results)
 
         results.print_progress
+
+        @count = 0
 
         @results << results
       end

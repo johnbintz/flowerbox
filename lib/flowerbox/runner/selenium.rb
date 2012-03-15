@@ -50,13 +50,18 @@ console.log = function(msg) {
   </head>
   <body>
     <h1>Flowerbox - #{Flowerbox.test_environment.name} Runner</h1>
+    <pre id="queue"></pre>
     <script type="text/javascript">
       Flowerbox.environment = '#{name}';
+      Flowerbox.onQueueStateChange = function(msg) {
+        //document.getElementById('queue').innerHTML = document.getElementById('queue').innerHTML + "\\n" + msg;
+      };
 
       var context = this;
 
       window.addEventListener('DOMContentLoaded', function() {
         #{env}
+        Flowerbox.startQueueRunner()
       }, false);
     </script>
   </body>

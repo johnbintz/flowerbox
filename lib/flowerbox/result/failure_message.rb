@@ -27,7 +27,7 @@ module Flowerbox::Result
     def first_local_stack
       @data['stack'][1..-1].find do |line|
         !system_files.any? { |file| line[%r{\(#{file}}] }
-      end || @data['stack'][1]
+      end || @data['stack'][1] || ''
     end
   end
 end

@@ -8,7 +8,9 @@ class Flowerbox::CLI < Thor
   method_options :pwd => :string, :env_options => nil, :runners => :string, :runner => :string, :verbose_server => false
   def test(dir = "spec/javascripts", *files)
     Dir.chdir(pwd) do
-      exit Flowerbox.run(dir, options.dup.merge(:files => files))
+      result = Flowerbox.run(dir, options.dup.merge(:files => files))
+      Flowerbox.cleanup!
+      exit result
     end
   end
 

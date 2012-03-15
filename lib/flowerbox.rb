@@ -110,6 +110,15 @@ module Flowerbox
     def run(dir, options = {})
       Flowerbox::Run::Test.execute(dir, options)
     end
+
+    def browsers
+      @browsers ||= {}
+    end
+
+    def cleanup!
+      browsers.values.each(&:close)
+      @browsers = {}
+    end
   end
 end
 

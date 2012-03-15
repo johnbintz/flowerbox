@@ -12,7 +12,6 @@ module Flowerbox
       end
 
       def cleanup
-        @browser.close if @browser
       end
 
       def browser

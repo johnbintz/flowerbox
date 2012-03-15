@@ -1,10 +1,6 @@
 module Flowerbox::Result::FileInfo
   def translated_file
-    @translated_file ||= if actual_file_base = filename[%r{\.tmp/sprockets(.*)}, 1]
-      Dir[actual_file_base + "*"].first
-    else
-      filename
-    end
+    @translated_file ||= filename
   end
 
   def file_translated?
@@ -12,7 +8,7 @@ module Flowerbox::Result::FileInfo
   end
 
   def filename
-    file.to_s.split(":").first
+    file.to_s.split(":").first || 'unknown'
   end
 
   def line_number
@@ -20,7 +16,7 @@ module Flowerbox::Result::FileInfo
 
     @line_number = file.to_s.split(":")[1]
     @line_number = "~#{@line_number}" if file_translated?
-    @line_number
+    @line_number ||= "0"
   end
 
   alias :line :line_number

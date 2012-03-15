@@ -116,7 +116,14 @@ module Flowerbox
     end
 
     def cleanup!
-      browsers.values.each(&:close)
+      browsers.values.each do |browser|
+        begin
+          browser.close
+        rescue Errno::ECONNREFUSED => e
+          puts "Browser already closed."
+        end
+      end
+
       @browsers = {}
     end
   end

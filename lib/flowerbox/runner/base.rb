@@ -7,6 +7,8 @@ module Flowerbox
 
       MAX_COUNT = 50
 
+      class RunnerDiedError < StandardError ; end
+
       def initialize
         @results = ResultSet.new
       end
@@ -18,9 +20,9 @@ module Flowerbox
         end
 
         if !finished?
+          puts "Something died hard. Here are the tests that did get run before Flowerbox died.".foreground(:red)
           puts tests.flatten.join("\n").foreground(:red)
-          cleanup
-          exit 1
+          raise RunnerDiedError.new
         end
       end
 

@@ -23,6 +23,8 @@ module Flowerbox::Run
       runner_envs.each(&:cleanup)
 
       result_set.exitstatus
+    rescue Flowerbox::Runner::Base::RunnerDiedError
+      255
     end
   end
 end

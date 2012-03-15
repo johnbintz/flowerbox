@@ -19,6 +19,7 @@ module Flowerbox
       desc "Run Flowerbox for the tests in #{options[:dir]}"
       task(name) do
         raise StandardError.new("Flowerbox tests failed") if Flowerbox.run(@options[:dir], @options) != 0
+        Flowerbox.cleanup!
       end
     end
   end

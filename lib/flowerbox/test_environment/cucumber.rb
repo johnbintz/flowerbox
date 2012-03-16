@@ -12,7 +12,7 @@ module Flowerbox
       def inject_into(sprockets)
         super
 
-        @sprockets.register_engine('.feature', Flowerbox::Delivery::Tilt::FeatureTemplate)
+        @sprockets.register_engine('.feature', Flowerbox::Tilt::FeatureTemplate)
       end
 
       def global_system_files
@@ -84,7 +84,9 @@ JS
   end
 end
 
-module Flowerbox::Delivery::Tilt
-  autoload :FeatureTemplate, 'flowerbox/delivery/tilt/feature_template'
+module Flowerbox
+  module Tilt
+    autoload :FeatureTemplate, 'flowerbox/tilt/feature_template'
+  end
 end
 

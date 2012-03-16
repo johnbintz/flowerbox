@@ -1,6 +1,6 @@
 require 'tilt'
 
-module Flowerbox::Delivery::Tilt
+module Flowerbox::Tilt
   class FeatureTemplate < Tilt::Template
     self.default_mime_type = 'application/javascript'
 

@@ -68,8 +68,7 @@ module Flowerbox
         true
       end
 
-      def configure
-      end
+      def configure ; end
 
       def pause_timer
         @timer_running = false

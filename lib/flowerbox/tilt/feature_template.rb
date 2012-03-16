@@ -1,21 +1,23 @@
 require 'tilt'
 
-module Flowerbox::Tilt
-  class FeatureTemplate < Tilt::Template
-    self.default_mime_type = 'application/javascript'
+module Flowerbox
+  module Tilt
+    class FeatureTemplate < ::Tilt::Template
+      self.default_mime_type = 'application/javascript'
 
-    def prepare; end
+      def prepare; end
 
-    def evaluate(scope, locals, &block)
-      <<-JS
+      def evaluate(scope, locals, &block)
+        <<-JS
 Flowerbox.Cucumber.Features = Flowerbox.Cucumber.Features || [];
 
 Flowerbox.Cucumber.Features.push("#{escaped_data}");
 JS
-    end
+      end
 
-    def escaped_data
-      data.gsub("\n", "\\n").gsub('"', '\\"')
+      def escaped_data
+        data.gsub("\n", "\\n").gsub('"', '\\"')
+      end
     end
   end
 end

@@ -18,6 +18,8 @@ module Flowerbox
     def initialize(options)
       @options = options
 
+      require 'flowerbox/unique_asset_list'
+
       @files = Flowerbox::UniqueAssetList.new
     end
 

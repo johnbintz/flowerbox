@@ -38,6 +38,7 @@ class jasmine.FlowerboxReporter
     for item in spec.results().items_
       if !item.passed_
         result.status = Flowerbox.Result.FAILURE
+
         stack = item.trace.stack || []
         if stack.constructor != Array
           stack = stack.split("\n")

@@ -1,3 +1,5 @@
+require 'thread'
+
 module Flowerbox
   module Runner
     class Base
@@ -8,6 +10,10 @@ module Flowerbox
       MAX_COUNT = 50
 
       class RunnerDiedError < StandardError ; end
+
+      def self.mutex
+        @mutex ||= Mutex.new
+      end
 
       def initialize
         @results = ResultSet.new
@@ -40,18 +46,20 @@ module Flowerbox
       end
 
       def run(*args)
-        setup(*args)
+        self.class.mutex.synchronize do
+          setup(*args)
 
-        @count = 0
-        @timer_running = true
+          @count = 0
+          @timer_running = true
 
-        puts "Flowerbox running your #{Flowerbox.test_environment.name} tests on #{console_name}..."
+          puts "Flowerbox running your #{Flowerbox.test_environment.name} tests on #{console_name}..."
 
-        server.start
+          server.start
 
-        yield
+          yield
 
-        server.stop
+          server.stop
+        end
 
         @results
       end
@@ -100,17 +108,20 @@ module Flowerbox
       end
 
       def server
-        return @server if @server
+        require 'flowerbox/rack'
+
+        Flowerbox::Rack.runner = self
+        Flowerbox::Rack.sprockets = @sprockets
+
+        return Flowerbox.server if Flowerbox.server
+
+        require 'flowerbox/server'
 
         server_options = { :app => Flowerbox::Rack }
         server_options[:logging] = true if options[:verbose_server]
         server_options[:port] = Flowerbox.port
 
-        @server = Flowerbox::Server.new(server_options)
-        Flowerbox::Rack.runner = self
-        Flowerbox::Rack.sprockets = @sprockets
-
-        @server
+        Flowerbox.server = Flowerbox::Server.new(server_options)
       end
 
       def log(message)

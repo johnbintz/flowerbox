@@ -4,6 +4,8 @@ module Flowerbox
 
     class << self
       def for(env)
+        require "flowerbox/test_environment/#{env}"
+
         find_constant(env).new
       end
     end

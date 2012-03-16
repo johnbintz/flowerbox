@@ -1,5 +1,6 @@
 require 'tempfile'
 require 'json'
+require 'flowerbox/runner/base'
 
 module Flowerbox
   module Runner

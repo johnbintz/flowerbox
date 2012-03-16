@@ -1,3 +1,5 @@
+require 'flowerbox/runner/selenium'
+
 class Flowerbox::Runner::Chrome < Flowerbox::Runner::Selenium
   def name
     "Chrome"

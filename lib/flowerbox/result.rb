@@ -10,12 +10,12 @@ module Flowerbox
       extend Flowerbox::CoreExt::Module
     end
 
-    autoload :Base, 'flowerbox/result/base'
-    autoload :Exception, 'flowerbox/result/exception'
-    autoload :Failure, 'flowerbox/result/failure'
-    autoload :Pending, 'flowerbox/result/pending'
-    autoload :FailureMessage, 'flowerbox/result/failure_message'
-    autoload :FileInfo, 'flowerbox/result/file_info'
+    require 'flowerbox/result/base'
+    require 'flowerbox/result/exception'
+    require 'flowerbox/result/failure'
+    require 'flowerbox/result/pending'
+    require 'flowerbox/result/failure_message'
+    require 'flowerbox/result/file_info'
 
     class << self
       def for(test_env, type)

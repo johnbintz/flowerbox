@@ -1,3 +1,5 @@
+require 'flowerbox/test_environment/base'
+
 module Flowerbox
   module TestEnvironment
     class Cucumber < Base
@@ -11,6 +13,8 @@ module Flowerbox
 
       def inject_into(sprockets)
         super
+
+        require 'flowerbox/tilt/feature_template'
 
         @sprockets.register_engine('.feature', Flowerbox::Tilt::FeatureTemplate)
       end
@@ -81,12 +85,6 @@ JS
         coffee_count > js_count
       end
     end
-  end
-end
-
-module Flowerbox
-  module Tilt
-    autoload :FeatureTemplate, 'flowerbox/tilt/feature_template'
   end
 end
 

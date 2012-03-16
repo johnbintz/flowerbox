@@ -1,3 +1,5 @@
+require 'flowerbox/runner/selenium'
+
 class Flowerbox::Runner::Firefox < Flowerbox::Runner::Selenium
   def name
     "Firefox"

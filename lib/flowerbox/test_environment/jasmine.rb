@@ -1,3 +1,4 @@
+require 'flowerbox/test_environment/base'
 require 'jasmine-core'
 
 module Flowerbox

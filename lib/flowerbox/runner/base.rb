@@ -106,7 +106,7 @@ module Flowerbox
         server_options[:logging] = true if options[:verbose_server]
         server_options[:port] = Flowerbox.port
 
-        @server = Flowerbox::Delivery::Server.new(server_options)
+        @server = Flowerbox::Server.new(server_options)
         Flowerbox::Rack.runner = self
         Flowerbox::Rack.sprockets = @sprockets
 

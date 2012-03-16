@@ -1,5 +1,4 @@
 require "flowerbox/version"
-require 'flowerbox-delivery'
 require 'rainbow'
 
 module Flowerbox
@@ -39,6 +38,10 @@ module Flowerbox
   autoload :Result, 'flowerbox/result'
 
   autoload :Reporter, 'flowerbox/reporter'
+
+  autoload :Server, 'flowerbox/server'
+  autoload :UniqueAssetList, 'flowerbox/unique_asset_list'
+  autoload :SprocketsHandler, 'flowerbox/sprockets_handler'
 
   class << self
     attr_writer :reporters

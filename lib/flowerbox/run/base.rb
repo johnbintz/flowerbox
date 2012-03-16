@@ -33,7 +33,7 @@ module Flowerbox::Run
     end
 
     def sprockets
-      Flowerbox::Delivery::SprocketsHandler.new(
+      Flowerbox::SprocketsHandler.new(
         :asset_paths => [
           Flowerbox.path.join("lib/assets/javascripts"),
           Flowerbox.path.join("vendor/assets/javascripts"),

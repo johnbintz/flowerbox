@@ -1,5 +1,4 @@
 require 'tempfile'
-require 'flowerbox/delivery/server'
 require 'json'
 
 module Flowerbox

@@ -22,6 +22,17 @@ class Flowerbox::CLI < Thor
     end
   end
 
+  desc "transplant DIR", "Convert an existing Jasmine gem-style project to Flowerbox"
+  def transplant(dir)
+    Flowerbox.transplant(dir)
+  end
+
+  desc "clean", "Clean the Sprockets cache"
+  def clean
+    FileUtils.rm_rf(Flowerbox::CACHE_DIR)
+    puts "Sprockets cache cleaned."
+  end
+
   default_task :test
 
   no_tasks do

@@ -1,11 +1,19 @@
 module Flowerbox
   class UniqueAssetList < ::Array
+    attr_reader :sprockets
+
+    def initialize(sprockets)
+      super([])
+
+      @sprockets = sprockets
+    end
+
     def add(files)
       [ files ].flatten.each { |file| self << file if !include?(file) }
     end
 
     def to_json
-      collect(&:logical_path)
+      collect { |file| sprockets.logical_path_for(file) }
     end
 
     private

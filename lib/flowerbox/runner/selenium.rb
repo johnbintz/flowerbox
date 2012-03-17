@@ -71,7 +71,7 @@ HTML
       end
 
       def template_files
-        sprockets.files.collect { |file| %{<script type="text/javascript" src="/__F__/#{file.logical_path}"></script>} }
+        sprockets.files.collect { |file| %{<script type="text/javascript" src="/__F__/#{sprockets.logical_path_for(file)}"></script>} }
       end
     end
   end

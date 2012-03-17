@@ -13,6 +13,10 @@ module Flowerbox
         @reporters ||= []
       end
 
+      def self.transplantable?
+        respond_to?(:transplant)
+      end
+
       def set_additional_options(opts = nil)
         @options = {}
 

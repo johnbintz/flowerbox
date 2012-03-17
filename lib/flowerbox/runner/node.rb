@@ -22,7 +22,7 @@ module Flowerbox
 
       def configured?
         File.directory?(File.join(Dir.pwd, 'node_modules/jsdom')) &&
-        File.directory?(File.join(Dir.pwd, 'node_modules/XMLHttpRequest'))
+        File.directory?(File.join(Dir.pwd, 'node_modules/xmlhttprequest'))
       end
 
       def cleanup ; end

@@ -56,6 +56,7 @@ console.log = function(msg) {
       Flowerbox.onQueueStateChange = function(msg) {
         //document.getElementById('queue').innerHTML = document.getElementById('queue').innerHTML + "\\n" + msg;
       };
+      Flowerbox.UNKNOWN = '#{Flowerbox::Result::FileInfo::UNKNOWN}';
 
       var context = this;
 

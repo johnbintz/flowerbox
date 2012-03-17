@@ -75,12 +75,6 @@ module Flowerbox
 
       runner.template
     end
-
-    class << self
-      private
-      def setup_protetion(builder)
-      end
-    end
   end
 end
 

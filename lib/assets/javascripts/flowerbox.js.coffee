@@ -21,7 +21,7 @@ Flowerbox =
 
   onQueueStateChange: ->
 
-  queueRunner: ->
+  queueRunner: (failsafe = 5) ->
     Flowerbox.onQueueStateChange("checking queue")
     if Flowerbox.contactQueue.length > 0
       Flowerbox.started = true
@@ -55,7 +55,10 @@ Flowerbox =
             xhr.abort()
             Flowerbox.onQueueStateChange("aborted #{url}, rerunning")
             Flowerbox.contactQueue.unshift(info)
-            Flowerbox.queueRunner()
+
+            if failsafe > 0
+              failsafe -= 1
+              Flowerbox.queueRunner(failsafe)
         , Flowerbox.delay * 5
       )
 

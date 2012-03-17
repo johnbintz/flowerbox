@@ -39,7 +39,7 @@ class Flowerbox.Cucumber.Reporter
       when 'StepResult'
         stepResult = event.getPayloadItem('stepResult')
 
-        file = Flowerbox.Step.matchFile(@step.getName()) || "unknown:0"
+        file = Flowerbox.Step.matchFile(@step.getName()) || "#{Flowerbox.UNKNOWN}:0"
 
         result = new Flowerbox.Result(step_type: this.type(), source: 'cucumber', original_name: @step.getName(), name: this.nameParts(), file: file)
 

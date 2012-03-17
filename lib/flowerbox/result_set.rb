@@ -41,7 +41,13 @@ module Flowerbox
     end
 
     def exitstatus
-      results.any?(&:failure?) ? 1 : 0
+      if results.any?(&:failure?)
+        1
+      elsif results.any?(&:pending?)
+        2
+      else
+        0
+      end
     end
 
     def print(data = {})

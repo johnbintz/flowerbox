@@ -17,16 +17,22 @@ Flowerbox.World = (code = null) ->
 Flowerbox.Matchers =
   toEqual: (expected) ->
     @message = "Expected #{@actual} #{@notMessage} equal #{expected}"
-    if typeof @actual == 'object'
-      for key, value of @actual
-        return false if expected[key] != value
+    result = null
 
-      for key, value of expected
-        return false if @actual[key] != value
+    if @actual? && expected?
+      switch (typeof @actual)
+        when 'object'
+          result = true
+          for key, value of @actual
+            result = false if expected[key] != value
 
-      true
-    else
-      @actual == expected
+          for key, value of expected
+            result = false if @actual[key] != value
+
+    if result == null
+      result = (@actual == expected)
+
+    result
 
 Flowerbox.World ->
   @assert = (what, message = 'failed') ->

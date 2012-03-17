@@ -4,7 +4,7 @@ class jasmine.FlowerboxReporter
       status: Flowerbox.Result.SUCCESS
       source: 'jasmine'
       name: spec.getSpecSplitName()
-      file: 'unknown:0'
+      file: "#{Flowerbox.UNKNOWN}:0"
 
     for key, value of overrides
       data[key] = value

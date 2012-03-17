@@ -11,7 +11,7 @@ jasmine.Spec.beforeAddMatcherResult().push ->
           when 'chrome'
             e.stack.split("\n")[4]
           else
-            'unknown:0'
+            "#{Flowerbox.UNKNOWN}:0"
 
         @trace = { stack: [ @message, file ] }
 

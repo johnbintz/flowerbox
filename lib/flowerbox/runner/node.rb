@@ -95,6 +95,7 @@ jsdom.env(
           if (!gotFlowerbox && context.Flowerbox) {
             context.Flowerbox.baseUrl = "http://localhost:#{server.port}/";
             context.Flowerbox.environment = 'node';
+            context.Flowerbox.UNKNOWN = '#{Flowerbox::Result::FileInfo::UNKNOWN}';
 
             gotFlowerbox = true;
           }

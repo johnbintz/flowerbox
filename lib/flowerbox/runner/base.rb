@@ -33,6 +33,9 @@ module Flowerbox
         if !finished?
           puts "Something died hard. Here are the tests that did get run before Flowerbox died.".foreground(:red)
           puts tests.flatten.join("\n").foreground(:red)
+          server.stop
+          Flowerbox.server = nil
+
           raise RunnerDiedError.new
         end
       end

@@ -4,7 +4,9 @@ require 'flowerbox'
 require 'thor'
 
 class Flowerbox::CLI < Thor
-  desc "test DIR FILES...", "Run the specs found in spec dir, loading spec_helper.rb for configuration details"
+  include Thor::Actions
+
+  desc "test", "Run the specs found in spec dir, loading spec_helper.rb for configuration details"
   method_options :pwd => :string, :env_options => nil, :runners => :string, :runner => :string, :verbose_server => false
   def test(dir = "spec/javascripts", *files)
     Dir.chdir(pwd) do
@@ -31,6 +33,15 @@ class Flowerbox::CLI < Thor
   def clean
     FileUtils.rm_rf(Flowerbox::CACHE_DIR)
     puts "Sprockets cache cleaned."
+  end
+
+  desc "plant", "Start a new Flowerbox project"
+  def plant(type, dir = nil)
+    env = Flowerbox::TestEnvironment.for(type)
+
+    self.class.source_root(Flowerbox.path.join(env.plant_source))
+
+    directory('.', dir || env.plant_target)
   end
 
   default_task :test

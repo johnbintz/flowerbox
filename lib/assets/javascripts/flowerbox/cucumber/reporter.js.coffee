@@ -49,6 +49,8 @@ class Flowerbox.Cucumber.Reporter
           result.status = Flowerbox.Result.PENDING
         else if stepResult.isUndefined()
           result.status = Flowerbox.Result.UNDEFINED
+          result.hasDataTable = @step.hasDataTable()
+          result.hasDocString = @step.hasDocString()
         else if stepResult.isFailed()
           result.status = Flowerbox.Result.FAILURE
 

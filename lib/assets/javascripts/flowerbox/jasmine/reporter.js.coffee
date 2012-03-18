@@ -4,7 +4,7 @@ class jasmine.FlowerboxReporter
       status: Flowerbox.Result.SUCCESS
       source: 'jasmine'
       name: spec.getSpecSplitName()
-      file: 'unknown:0'
+      file: "#{Flowerbox.UNKNOWN}:0"
 
     for key, value of overrides
       data[key] = value
@@ -38,6 +38,7 @@ class jasmine.FlowerboxReporter
     for item in spec.results().items_
       if !item.passed_
         result.status = Flowerbox.Result.FAILURE
+
         stack = item.trace.stack || []
         if stack.constructor != Array
           stack = stack.split("\n")

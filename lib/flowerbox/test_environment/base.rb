@@ -13,6 +13,10 @@ module Flowerbox
         @reporters ||= []
       end
 
+      def self.transplantable?
+        respond_to?(:transplant)
+      end
+
       def set_additional_options(opts = nil)
         @options = {}
 
@@ -40,6 +44,10 @@ module Flowerbox
 
       def start
         runner.spec_files.each { |file| @sprockets.add(file) }
+      end
+
+      def actual_path_for(file)
+        @sprockets.asset_for(file, :bundle => false).pathname.to_s
       end
     end
   end

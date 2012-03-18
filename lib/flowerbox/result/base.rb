@@ -3,6 +3,7 @@ require 'forwardable'
 module Flowerbox
   module Result
     class Base
+      require 'flowerbox/result/file_info'
       include Flowerbox::Result::FileInfo
 
       extend Forwardable

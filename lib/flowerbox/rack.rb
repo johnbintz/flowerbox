@@ -66,6 +66,8 @@ module Flowerbox
     get %r{^/__F__/(.*)$} do |file|
       asset = sprockets.asset_for(file, :bundle => false)
 
+      halt(404) if !asset
+
       content_type asset.content_type
       asset.body
     end
@@ -74,12 +76,6 @@ module Flowerbox
       sprockets.expire_index!
 
       runner.template
-    end
-
-    class << self
-      private
-      def setup_protetion(builder)
-      end
     end
   end
 end

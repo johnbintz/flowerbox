@@ -31,7 +31,7 @@ module Flowerbox::Result
     end
 
     def stack
-      @data['stack']
+      @data['stack'] || []
     end
 
     def first_local_stack

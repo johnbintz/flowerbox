@@ -1,3 +1,5 @@
+require 'flowerbox/runner/selenium'
+
 class Flowerbox::Runner::Firefox < Flowerbox::Runner::Selenium
   def name
     "Firefox"
@@ -8,7 +10,7 @@ class Flowerbox::Runner::Firefox < Flowerbox::Runner::Selenium
   end
 
   def browser
-    @browser ||= ::Selenium::WebDriver.for(:firefox)
+    Flowerbox.browsers[:firefox] ||= ::Selenium::WebDriver.for(:firefox)
   end
 end
 

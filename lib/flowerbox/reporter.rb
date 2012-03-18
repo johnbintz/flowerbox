@@ -2,11 +2,12 @@ module Flowerbox
   module Reporter
     extend Flowerbox::CoreExt::Module
 
-    autoload :Base, 'flowerbox/reporter/base'
-    autoload :ConsoleBase, 'flowerbox/reporter/console_base'
-    autoload :Verbose, 'flowerbox/reporter/verbose'
-    autoload :Progress, 'flowerbox/reporter/progress'
-    autoload :FileDisplay, 'flowerbox/reporter/file_display'
+    require 'flowerbox/reporter/file_display'
+
+    require 'flowerbox/reporter/base'
+    require 'flowerbox/reporter/console_base'
+    require 'flowerbox/reporter/verbose'
+    require 'flowerbox/reporter/progress'
   end
 end
 

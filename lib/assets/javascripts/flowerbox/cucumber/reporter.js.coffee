@@ -39,7 +39,7 @@ class Flowerbox.Cucumber.Reporter
       when 'StepResult'
         stepResult = event.getPayloadItem('stepResult')
 
-        file = Flowerbox.Step.matchFile(@step.getName()) || "unknown:0"
+        file = Flowerbox.Step.matchFile(@step.getName()) || "#{Flowerbox.UNKNOWN}:0"
 
         result = new Flowerbox.Result(step_type: this.type(), source: 'cucumber', original_name: @step.getName(), name: this.nameParts(), file: file)
 
@@ -49,6 +49,8 @@ class Flowerbox.Cucumber.Reporter
           result.status = Flowerbox.Result.PENDING
         else if stepResult.isUndefined()
           result.status = Flowerbox.Result.UNDEFINED
+          result.hasDataTable = @step.hasDataTable()
+          result.hasDocString = @step.hasDocString()
         else if stepResult.isFailed()
           result.status = Flowerbox.Result.FAILURE
 

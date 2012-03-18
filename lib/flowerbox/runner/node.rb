@@ -1,6 +1,6 @@
 require 'tempfile'
-require 'flowerbox/delivery/server'
 require 'json'
+require 'flowerbox/runner/base'
 
 module Flowerbox
   module Runner
@@ -22,7 +22,7 @@ module Flowerbox
 
       def configured?
         File.directory?(File.join(Dir.pwd, 'node_modules/jsdom')) &&
-        File.directory?(File.join(Dir.pwd, 'node_modules/XMLHttpRequest'))
+        File.directory?(File.join(Dir.pwd, 'node_modules/xmlhttprequest'))
       end
 
       def cleanup ; end
@@ -95,6 +95,7 @@ jsdom.env(
           if (!gotFlowerbox && context.Flowerbox) {
             context.Flowerbox.baseUrl = "http://localhost:#{server.port}/";
             context.Flowerbox.environment = 'node';
+            context.Flowerbox.UNKNOWN = '#{Flowerbox::Result::FileInfo::UNKNOWN}';
 
             gotFlowerbox = true;
           }

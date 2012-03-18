@@ -1,44 +1,27 @@
 require "flowerbox/version"
-require 'flowerbox-delivery'
 require 'rainbow'
 
 module Flowerbox
-  module CoreExt
-    autoload :Module, 'flowerbox/core_ext/module'
+  require 'flowerbox/core_ext/module'
+
+  require 'flowerbox/runner'
+
+  require 'flowerbox/run/base'
+  require 'flowerbox/run/test'
+  require 'flowerbox/run/debug'
+
+  require 'flowerbox/test_environment'
+  require 'flowerbox/result'
+  require 'flowerbox/result_set'
+  require 'flowerbox/gathered_result'
+
+  require 'flowerbox/reporter'
+
+  if defined?(Rails::Engine)
+    require 'flowerbox/rails/engine'
   end
 
-  autoload :Runner, 'flowerbox/runner'
-  autoload :Task, 'flowerbox/task'
-
-  module Run
-    autoload :Base, 'flowerbox/run/base'
-    autoload :Test, 'flowerbox/run/test'
-    autoload :Debug, 'flowerbox/run/debug'
-  end
-
-  module Runner
-    autoload :Node, 'flowerbox/runner/node'
-    autoload :Selenium, 'flowerbox/runner/selenium'
-    autoload :Firefox, 'flowerbox/runner/firefox'
-    autoload :Chrome, 'flowerbox/runner/chrome'
-    autoload :Base, 'flowerbox/runner/base'
-  end
-
-  autoload :TestEnvironment, 'flowerbox/test_environment'
-
-  module TestEnvironment
-    autoload :Base, 'flowerbox/test_environment/base'
-    autoload :Jasmine, 'flowerbox/test_environment/jasmine'
-    autoload :Cucumber, 'flowerbox/test_environment/cucumber'
-  end
-
-  autoload :Rack, 'flowerbox/rack'
-
-  autoload :ResultSet, 'flowerbox/result_set'
-  autoload :GatheredResult, 'flowerbox/gathered_result'
-  autoload :Result, 'flowerbox/result'
-
-  autoload :Reporter, 'flowerbox/reporter'
+  CACHE_DIR = '.tmp-sprockets'
 
   class << self
     attr_writer :reporters
@@ -84,7 +67,7 @@ module Flowerbox
       Pathname(File.expand_path('../..', __FILE__))
     end
 
-    attr_accessor :test_environment, :runner_environment, :bare_coffeescript
+    attr_accessor :test_environment, :runner_environment, :bare_coffeescript, :server
 
     def configure
       yield self
@@ -125,6 +108,12 @@ module Flowerbox
       end
 
       @browsers = {}
+    end
+
+    def transplant(dir)
+      Flowerbox::TestEnvironment.transplantable_environments.each do |env|
+        break if env.transplant(dir)
+      end
     end
   end
 end

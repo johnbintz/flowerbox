@@ -1,3 +1,5 @@
+require 'flowerbox/test_environment/base'
+
 module Flowerbox
   module TestEnvironment
     class Cucumber < Base
@@ -12,7 +14,9 @@ module Flowerbox
       def inject_into(sprockets)
         super
 
-        @sprockets.register_engine('.feature', Flowerbox::Delivery::Tilt::FeatureTemplate)
+        require 'flowerbox/tilt/feature_template'
+
+        @sprockets.register_engine('.feature', Flowerbox::Tilt::FeatureTemplate)
       end
 
       def global_system_files
@@ -56,20 +60,34 @@ JS
           " (\d+) "
         end
 
+        messages = []
+
+        if result['hasDataTable']
+          args << "table"
+          messages << "table is a Cucumber AST data table"
+        end
+
+        if result['hasDocString']
+          args << "string"
+          messages << "string is a doc string"
+        end
+
         args_string = args.join(', ')
 
+        output = []
+
         if primarily_coffeescript?
-          <<-COFFEE
-Flowerbox.#{result.step_type} /^#{matcher}$/, #{"(#{args_string}) " if !args_string.empty?}->
-  @pending() # add your code here
-COFFEE
+          output << %{Flowerbox.#{result.step_type} /^#{matcher}$/, #{"(#{args_string}) " if !args_string.empty?}->}
+          output += messages.collect { |msg| "  # #{msg}" }
+          output << %{  @pending() # add your code here}
         else
-          <<-JS
-Flowerbox.#{result.step_type}(/^#{matcher}$/, function(#{args_string}) {
-  this.pending(); // add your code here
-});
-JS
+          output << "Flowerbox.#{result.step_type}(/^#{matcher}$/, function(#{args_string}) {"
+          output += messages.collect { |msg| "  // #{msg}" }
+          output << %{  this.pending(); // add your code here}
+          output << "});"
         end
+
+        output.collect { |line| "#{line}\n" }.join
       end
 
       def primarily_coffeescript?
@@ -80,11 +98,15 @@ JS
 
         coffee_count > js_count
       end
+
+      def plant_source
+        "skel/cucumber"
+      end
+
+      def plant_target
+        "js-features"
+      end
     end
   end
-end
-
-module Flowerbox::Delivery::Tilt
-  autoload :FeatureTemplate, 'flowerbox/delivery/tilt/feature_template'
 end
 

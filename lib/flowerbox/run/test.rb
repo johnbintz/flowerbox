@@ -1,5 +1,7 @@
 module Flowerbox::Run
   class Test < Base
+    require 'flowerbox/runner/base'
+
     def execute
       prep!
 

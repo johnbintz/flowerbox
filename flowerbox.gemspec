@@ -4,8 +4,8 @@ require File.expand_path('../lib/flowerbox/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["John Bintz"]
   gem.email         = ["john@coswellproductions.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{No-nonsense JavaScript testing solution.}
+  gem.summary       = %q{No-nonsense JavaScript testing solution.}
   gem.homepage      = ""
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
@@ -23,4 +23,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'selenium-webdriver'
   gem.add_dependency 'sinatra'
   gem.add_dependency 'rainbow'
+  gem.add_dependency 'sprockets-vendor_gems'
 end

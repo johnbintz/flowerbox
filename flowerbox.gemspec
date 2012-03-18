@@ -19,7 +19,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec'
 
   gem.add_dependency 'jasmine-core'
-  gem.add_dependency 'flowerbox-delivery'
   gem.add_dependency 'thor'
   gem.add_dependency 'selenium-webdriver'
   gem.add_dependency 'sinatra'

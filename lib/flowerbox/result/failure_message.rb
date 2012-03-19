@@ -34,6 +34,14 @@ module Flowerbox::Result
       @data['stack'] || []
     end
 
+    def filtered_stack
+      stack.collect do |line|
+        line.gsub(%r{\.coffee:(\d+)}) do |_|
+          ".coffee:~#{($1.to_i * 0.67 + 1).to_i}"
+        end
+      end
+    end
+
     def first_local_stack
       @first_local_stack ||= stack[1..-1].find do |line|
         !system_files.any? { |file| line[%r{\(#{file}}] }

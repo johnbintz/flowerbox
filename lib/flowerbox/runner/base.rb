@@ -57,7 +57,20 @@ module Flowerbox
 
           puts "Flowerbox running your #{Flowerbox.test_environment.name} tests on #{console_name}..."
 
-          server.start
+          attempts = 3
+
+          while true
+            begin
+              server.start
+
+              break
+            rescue Flowerbox::Server::ServerDiedError
+              attempts -= 1
+              raise RunnerDiedError.new if attempts == 0
+
+              Flowerbox.server = nil
+            end
+          end
 
           yield
 

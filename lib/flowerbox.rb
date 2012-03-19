@@ -21,7 +21,7 @@ module Flowerbox
     require 'flowerbox/rails/engine'
   end
 
-  CACHE_DIR = '.tmp-sprockets'
+  CACHE_DIR = 'tmp/sprockets'
 
   class << self
     attr_writer :reporters
@@ -114,6 +114,10 @@ module Flowerbox
       Flowerbox::TestEnvironment.transplantable_environments.each do |env|
         break if env.transplant(dir)
       end
+    end
+
+    def cache_dir
+      File.join(CACHE_DIR, Flowerbox.test_environment.name)
     end
   end
 end

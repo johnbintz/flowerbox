@@ -62,8 +62,8 @@ module Flowerbox
       asset_path = asset.pathname.to_s
 
       environment.paths.each do |path|
-        if asset_path[%r{^#{path}}]
-          return asset_path.gsub(%r{^#{path}/}, '')
+        if result = asset_path[%r{^#{path}/(.*)}, 1]
+          return result
         end
       end
 

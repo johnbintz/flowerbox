@@ -38,6 +38,10 @@ module Flowerbox
 <html>
   <head>
     <title>Flowerbox - #{Flowerbox.test_environment.name} Runner</title>
+  </head>
+  <body>
+    <h1>Flowerbox - #{Flowerbox.test_environment.name} Runner</h1>
+    <pre id="queue"></pre>
     <script type="text/javascript">
 console._log = console.log;
 
@@ -47,10 +51,6 @@ console.log = function(msg) {
 }
     </script>
     #{template_files.join("\n")}
-  </head>
-  <body>
-    <h1>Flowerbox - #{Flowerbox.test_environment.name} Runner</h1>
-    <pre id="queue"></pre>
     <script type="text/javascript">
       Flowerbox.environment = '#{name}';
       Flowerbox.onQueueStateChange = function(msg) {

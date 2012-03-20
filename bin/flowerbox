@@ -72,7 +72,7 @@ class Flowerbox::CLI < Thor
 
   def method_missing(method, *args)
     if File.directory?(method.to_s)
-      invoke :test, method.to_s, *args
+      test(method.to_s, *args)
     else
       super
     end
@@ -81,10 +81,6 @@ class Flowerbox::CLI < Thor
   no_tasks do
     def pwd
       options[:pwd] || Dir.pwd
-    end
-
-    def asset_paths
-      Flowerbox.asset_paths.collect { |path| File.join(pwd, path) }
     end
   end
 end

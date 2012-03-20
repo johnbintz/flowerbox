@@ -1,5 +1,6 @@
 require "flowerbox/version"
 require 'rainbow'
+require 'forwardable'
 
 module Flowerbox
   require 'flowerbox/core_ext/module'
@@ -16,6 +17,7 @@ module Flowerbox
   require 'flowerbox/gathered_result'
 
   require 'flowerbox/reporter'
+  require 'flowerbox/configuration'
 
   if defined?(Rails::Engine)
     require 'flowerbox/rails/engine'
@@ -24,62 +26,20 @@ module Flowerbox
   CACHE_DIR = 'tmp/sprockets'
 
   class << self
-    attr_writer :reporters
-    attr_accessor :port
-
     def reset!
-      @spec_patterns = nil
-      @spec_files = nil
-      @asset_paths = nil
-      @reporters = nil
-      @port = nil
+      @configuration = nil
     end
 
-    def spec_patterns
-      @spec_patterns ||= []
-    end
-
-    def asset_paths
-      @asset_paths ||= []
-    end
-
-    def reporters
-      @reporters ||= []
-    end
-
-    def additional_files
-      @additional_files ||= []
-    end
-
-    def test_with(what)
-      self.test_environment = Flowerbox::TestEnvironment.for(what)
-    end
-
-    def run_with(*whats)
-      self.runner_environment = whats.flatten.collect { |what| Flowerbox::Runner.for(what.to_s) }
-    end
-
-    def report_with(*whats)
-      self.reporters = whats.flatten.collect { |what| Flowerbox::Reporter.for(what.to_s) }
+    def configuration
+      @configuration ||= Flowerbox::Configuration.new
     end
 
     def path
       Pathname(File.expand_path('../..', __FILE__))
     end
 
-    attr_accessor :test_environment, :runner_environment, :bare_coffeescript, :server
-
-    def configure
-      yield self
-
-      if spec_patterns.empty?
-        spec_patterns << "**/*_spec*"
-        spec_patterns << "*/*_spec*"
-      end
-
-      if reporters.empty?
-        reporters << Flowerbox::Reporter.for(:progress)
-      end
+    def configure(&block)
+      configuration.configure(&block)
     end
 
     def bare_coffeescript
@@ -118,6 +78,14 @@ module Flowerbox
 
     def cache_dir
       File.join(CACHE_DIR, Flowerbox.test_environment.name)
+    end
+
+    def method_missing(method, *args)
+      if configuration.respond_to?(method)
+        configuration.send(method, *args)
+      else
+        super
+      end
     end
   end
 end

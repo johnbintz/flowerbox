@@ -6,10 +6,19 @@ module Flowerbox
       super([])
 
       @sprockets = sprockets
+
+      @included = {}
     end
 
     def add(files)
-      [ files ].flatten.each { |file| self << file if !include?(file) }
+      [ files ].flatten.each do |file|
+        self << file if !included?(file)
+      end
+    end
+
+    def <<(file)
+      super(file)
+      @included[file.pathname.to_s] = true
     end
 
     def to_json
@@ -17,8 +26,8 @@ module Flowerbox
     end
 
     private
-    def include?(file)
-      any? { |other_file| other_file.pathname.to_s == file.pathname.to_s }
+    def included?(file)
+      @included[file.pathname.to_s]
     end
   end
 end

@@ -35,11 +35,13 @@ module Flowerbox::Result
     end
 
     def filtered_stack
-      stack.collect do |line|
+      stack.reject { |line|
+        Flowerbox.backtrace_filter.any? { |filter| line[filter] }
+      }.collect { |line|
         line.gsub(%r{\.coffee:(\d+)}) do |_|
           ".coffee:~#{($1.to_i * 0.67 + 1).to_i}"
         end
-      end
+      }
     end
 
     def first_local_stack

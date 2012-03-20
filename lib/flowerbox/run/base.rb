@@ -35,14 +35,16 @@ module Flowerbox::Run
     def sprockets
       require 'flowerbox/sprockets_handler'
 
-      Flowerbox::SprocketsHandler.new(
-        :asset_paths => [
-          Flowerbox.path.join("lib/assets/javascripts"),
-          Flowerbox.path.join("vendor/assets/javascripts"),
-          @dir,
-          Flowerbox.asset_paths
-        ].flatten
-      )
+      Flowerbox::SprocketsHandler.new(:asset_paths => asset_paths)
+    end
+
+    def asset_paths
+      [
+        Flowerbox.path.join("lib/assets/javascripts"),
+        Flowerbox.path.join("vendor/assets/javascripts"),
+        @dir,
+        Flowerbox.asset_paths
+      ].flatten
     end
 
     def spec_files

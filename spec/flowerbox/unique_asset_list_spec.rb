@@ -1,12 +1,14 @@
 require 'spec_helper'
+require 'flowerbox/unique_asset_list'
 
-describe Flowerbox::Delivery::UniqueAssetList do
-  let(:unique_asset_list) { described_class.new }
+describe Flowerbox::UniqueAssetList do
+  let(:unique_asset_list) { described_class.new(sprockets) }
+  let(:sprockets) { stub }
 
   describe "#add" do
-    let(:first) { Pathname.new('one') }
-    let(:second) { Pathname.new('one') }
-    let(:third) { Pathname.new('two') }
+    let(:first) { stub(:pathname => Pathname.new('one')) }
+    let(:second) { stub(:pathname => Pathname.new('one')) }
+    let(:third) { stub(:pathname => Pathname.new('two')) }
 
     it 'should not add assets already added' do
       unique_asset_list.add(first)

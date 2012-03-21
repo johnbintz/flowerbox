@@ -2,7 +2,9 @@ require 'spec_helper'
 require 'socket'
 require 'thread'
 
-describe Flowerbox::Delivery::Server do
+require 'flowerbox/server'
+
+describe Flowerbox::Server do
   let(:server) { described_class.new(options) }
   let(:options) { nil }
 
@@ -15,6 +17,30 @@ describe Flowerbox::Delivery::Server do
 
     its(:port) { should == port }
     its(:interface) { should == interface }
+  end
+
+  describe '#app' do
+    subject { server.app }
+
+    context 'no app defined' do
+      before do
+        server.stubs(:options).returns({})
+      end
+
+      it 'should raise an error' do
+        expect { server.app }.to raise_error(Flowerbox::Server::MissingRackApp)
+      end
+    end
+
+    context 'app defined' do
+      let(:app) { 'app' }
+
+      before do
+        server.stubs(:options).returns(:app => app)
+      end
+
+      it { should == app }
+    end
   end
 
   describe '#start' do

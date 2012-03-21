@@ -6,7 +6,19 @@ require 'thor'
 class Flowerbox::CLI < Thor
   include Thor::Actions
 
-  desc "test", "Run the specs found in spec dir, loading spec_helper.rb for configuration details"
+  default_task :help
+
+  def help(*args)
+    if !args.first
+      puts "Flowerbox is a multi-environment, multi-runner JavaScript testing tool."
+      puts "It supports Jasmine and Cucumber.js, and it runs tests on Node.js and Selenium-driven browsers."
+      puts
+    end
+
+    super
+  end
+
+  desc "test [DIR]", "Run the specs found in spec dir, loading spec_helper.rb for configuration details"
   method_options :pwd => :string, :env_options => nil, :runners => :string, :runner => :string, :verbose_server => false
   def test(dir = "spec/javascripts", *files)
     Dir.chdir(pwd) do
@@ -24,7 +36,21 @@ class Flowerbox::CLI < Thor
     end
   end
 
-  desc "transplant DIR", "Convert an existing Jasmine gem-style project to Flowerbox"
+  desc "transplant DIR", "Convert an existing JavaScript testing project to Flowerbox"
+  long_desc <<-TXT
+    `flowerbox transplant` converts an existing JavaScript testing project type
+    to Flowerbox. Currently, you can transplant the following types of projects:
+
+    * Pivotal Labs Jasmine gem-style
+    \x5  (also covers jasmine-headless-webkit)
+
+    These types of projects live in `spec/javascripts` (or the specified directory)
+    and have the file `support/jasmine.yml` that defines what files are loaded
+    at what parts in the test load process. `jasmine.yml` is converted to a
+    Flowerbox `spec_helper.rb` file and placed into `spec/javascripts`.
+
+    Flowerbox will ask before overwriting existing files.
+  TXT
   def transplant(dir)
     Flowerbox.transplant(dir)
   end
@@ -35,7 +61,7 @@ class Flowerbox::CLI < Thor
     puts "Sprockets cache cleaned."
   end
 
-  desc "plant", "Start a new Flowerbox project"
+  desc "plant TYPE [DIR]", "Start a new Flowerbox project of TYPE, potentially specifying a different DIR to install"
   def plant(type, dir = nil)
     env = Flowerbox::TestEnvironment.for(type)
 
@@ -44,15 +70,17 @@ class Flowerbox::CLI < Thor
     directory('.', dir || env.plant_target)
   end
 
-  default_task :test
+  def method_missing(method, *args)
+    if File.directory?(method.to_s)
+      test(method.to_s, *args)
+    else
+      super
+    end
+  end
 
   no_tasks do
     def pwd
       options[:pwd] || Dir.pwd
-    end
-
-    def asset_paths
-      Flowerbox.asset_paths.collect { |path| File.join(pwd, path) }
     end
   end
 end

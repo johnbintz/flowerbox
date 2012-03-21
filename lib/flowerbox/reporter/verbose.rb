@@ -12,6 +12,8 @@ module Flowerbox::Reporter
       if result.name
         result.name.each_with_index do |name, index|
           if @name_stack[index] != name
+            @name_stack = []
+
             if name != result.name.last
               message = name
             else

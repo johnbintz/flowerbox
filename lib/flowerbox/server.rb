@@ -9,6 +9,7 @@ module Flowerbox
     attr_reader :options
 
     class MissingRackApp < StandardError ; end
+    class ServerDiedError < StandardError ; end
 
     def initialize(options = {})
       @options = { :logging => false }.merge(options || {})
@@ -44,7 +45,7 @@ module Flowerbox
         sleep 0.1
       end
 
-      raise StandardError.new("Server died") if !@server_thread[:server].running?
+      raise ServerDiedError.new if !@server_thread[:server].running?
     end
 
     def stop

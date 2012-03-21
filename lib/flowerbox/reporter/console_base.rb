@@ -20,7 +20,7 @@ module Flowerbox::Reporter
       puts result.name.join(" - ").foreground(:red)
       result.failures.each do |failure|
         puts "  " + failure.message.foreground(:red) + " [" + failure.runners.join(',') + "] " + path_for(failure)
-        puts failure.stack.join("\n").foreground(:red) if failure.exception?
+        puts failure.filtered_stack.join("\n").foreground(:red) if failure.exception?
       end
     end
 

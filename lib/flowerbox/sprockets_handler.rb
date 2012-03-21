@@ -2,6 +2,7 @@ require 'sprockets'
 require 'sprockets/engines'
 require 'forwardable'
 require 'sprockets-vendor_gems'
+require 'fileutils'
 
 module Flowerbox
   class SprocketsHandler
@@ -39,7 +40,9 @@ module Flowerbox
       return @environment if @environment
 
       @environment = Sprockets::Environment.new
-      @environment.cache = Sprockets::Cache::FileStore.new(Flowerbox::CACHE_DIR)
+      FileUtils.rm_rf(Flowerbox.cache_dir)
+
+      @environment.cache = Sprockets::Cache::FileStore.new(Flowerbox.cache_dir)
 
       self.class.gem_asset_paths.each { |path| append_path(path) }
       options[:asset_paths].each { |path| append_path(path) }
@@ -59,8 +62,8 @@ module Flowerbox
       asset_path = asset.pathname.to_s
 
       environment.paths.each do |path|
-        if asset_path[%r{^#{path}}]
-          return asset_path.gsub(%r{^#{path}/}, '')
+        if result = asset_path[%r{^#{path}/(.*)}, 1]
+          return result
         end
       end
 

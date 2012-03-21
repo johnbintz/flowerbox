@@ -18,4 +18,5 @@ tmp
 .tmp
 node_modules/
 .tmp-sprockets/
-
+_site/
+.sass-cache/

@@ -21,7 +21,16 @@ module Flowerbox
 
       def run(sprockets, spec_files, options)
         super do
-          browser.navigate.to "http://localhost:#{server.port}/"
+          navigate = Proc.new { browser.navigate.to "http://localhost:#{server.port}/" }
+
+          begin
+            navigate.call
+          rescue ::Selenium::WebDriver::Error::UnknownError => e
+            puts "Browser communication error, reopening all browsers...".foreground(:yellow)
+            Flowerbox.cleanup!
+
+            navigate.call
+          end
 
           ensure_alive
         end

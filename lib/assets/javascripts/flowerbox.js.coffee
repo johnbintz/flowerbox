@@ -19,6 +19,8 @@ Flowerbox =
   started: false
   done: false
 
+  xhrObjects: {}
+
   onQueueStateChange: ->
 
   queueRunner: (failsafe = 5) ->

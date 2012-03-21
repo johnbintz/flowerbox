@@ -63,7 +63,9 @@ module Flowerbox
         begin
           browser.close
         rescue Errno::ECONNREFUSED => e
-          puts "Browser already closed."
+          puts "Browser already closed.".foreground(:yellow)
+        rescue ::Selenium::WebDriver::Error::UnknownError => e
+          puts "Unknown browser error, pushing past it to close...".foreground(:yellow)
         end
       end
 

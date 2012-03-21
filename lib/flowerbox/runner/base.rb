@@ -78,6 +78,10 @@ module Flowerbox
         end
 
         @results
+      rescue ExecJS::RuntimeError => e
+        puts e.message.foreground(:red)
+
+        raise RunnerDiedError.new
       end
 
       def configured?

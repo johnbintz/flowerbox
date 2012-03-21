@@ -48,7 +48,7 @@ module Flowerbox::Result
     end
 
     def first_local_stack
-      @first_local_stack ||= stack[1..-1].find do |line|
+      @first_local_stack ||= (stack[1..-1] || []).find do |line|
         !system_files.any? { |file| line[%r{\(#{file}}] }
       end || stack[1] || ''
     end

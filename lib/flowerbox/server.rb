@@ -3,6 +3,7 @@ require 'net/http'
 require 'socket'
 require 'rack/builder'
 require 'thin'
+require 'eventmachine'
 
 module Flowerbox
   class Server

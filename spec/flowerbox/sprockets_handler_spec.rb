@@ -1,6 +1,7 @@
 require 'spec_helper'
+require 'flowerbox/sprockets_handler'
 
-describe Flowerbox::Delivery::SprocketsHandler do
+describe Flowerbox::SprocketsHandler do
   let(:sprockets_handler) { described_class.new(options) }
   let(:options) { { :asset_paths => asset_paths } }
   let(:asset_paths) { [ File.expand_path('asset path') ] }

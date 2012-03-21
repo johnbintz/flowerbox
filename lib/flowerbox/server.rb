@@ -8,27 +8,32 @@ module Flowerbox
   class Server
     attr_reader :options
 
+    class MissingRackApp < StandardError ; end
+
     def initialize(options = {})
       @options = { :logging => false }.merge(options || {})
+    end
+
+    def app
+      options[:app] || raise(MissingRackApp.new)
     end
 
     def start
       @server_thread = Thread.new do
         server_options = { :Port => port, :Host => interface }
 
-        app = options[:app]
-
         Thin::Logging.silent = !options[:logging]
 
+        rack_app = app
+
         if options[:logging]
-          real_app = app
-          app = ::Rack::Builder.new do
+          rack_app = ::Rack::Builder.new do
             use ::Rack::CommonLogger, STDOUT
-            run real_app
+            run app
           end
         end
 
-        ::Rack::Handler::Thin.run(app, server_options) do |server|
+        ::Rack::Handler::Thin.run(rack_app, server_options) do |server|
           Thread.current[:server] = server
 
           trap('QUIT') { server.stop }

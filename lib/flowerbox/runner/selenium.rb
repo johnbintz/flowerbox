@@ -62,9 +62,6 @@ console.log = function(msg) {
     #{template_files.join("\n")}
     <script type="text/javascript">
       Flowerbox.environment = '#{name}';
-      Flowerbox.onQueueStateChange = function(msg) {
-        //document.getElementById('queue').innerHTML = document.getElementById('queue').innerHTML + "\\n" + msg;
-      };
       Flowerbox.UNKNOWN = '#{Flowerbox::Result::FileInfo::UNKNOWN}';
 
       var context = this;

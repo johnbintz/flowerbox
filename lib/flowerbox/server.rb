@@ -64,7 +64,6 @@ module Flowerbox
             }
           end
 
-
           ::Rack::Handler::Thin.run(rack_app, server_options) do |server|
             Thread.current[:server] = server
 

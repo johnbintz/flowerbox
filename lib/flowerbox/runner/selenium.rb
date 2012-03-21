@@ -70,8 +70,10 @@ console.log = function(msg) {
       var context = this;
 
       window.addEventListener('DOMContentLoaded', function() {
-        #{env}
-        Flowerbox.startQueueRunner()
+        Flowerbox.socket = new WebSocket('ws://localhost:#{server.port + 1}/');
+        Flowerbox.socket.onopen = function() {
+          #{env}
+        };
       }, false);
     </script>
   </body>

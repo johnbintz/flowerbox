@@ -33,5 +33,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'sprockets'
   gem.add_dependency 'sprockets-vendor_gems'
   gem.add_dependency 'thin'
+  gem.add_dependency 'em-websocket'
 end
 

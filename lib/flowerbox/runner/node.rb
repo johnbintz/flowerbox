@@ -22,13 +22,13 @@ module Flowerbox
 
       def configured?
         File.directory?(File.join(Dir.pwd, 'node_modules/jsdom')) &&
-        File.directory?(File.join(Dir.pwd, 'node_modules/xmlhttprequest'))
+        File.directory?(File.join(Dir.pwd, 'node_modules/ws'))
       end
 
       def cleanup ; end
 
       def configure
-        system %{bash -c "mkdir -p node_modules && npm link jsdom && npm link xmlhttprequest"}
+        system %{bash -c "mkdir -p node_modules && npm link jsdom && npm link ws"}
       end
 
       def run(sprockets, spec_files, options)
@@ -53,7 +53,7 @@ var fs = require('fs'),
     vm = require('vm'),
     http = require('http'),
     jsdom = require('jsdom'),
-    xhr = require('xmlhttprequest')
+    ws = require('ws')
 
 // expand the sandbox a bit
 var context = function() {};
@@ -62,7 +62,7 @@ for (method in global) { context[method] = global[method]; }
 jsdom.env(
   "<html><head><title></title></head><body></body></html>", [], function(errors, window) {
   context.window = window;
-  context.XMLHttpRequest = xhr.XMLHttpRequest;
+  context.WebSocket = ws;
 
   var gotFlowerbox = false;
 
@@ -106,23 +106,20 @@ jsdom.env(
 
       request.end();
     } else {
-      #{env}
+      context.Flowerbox.socket = new ws('ws://localhost:#{server.port + 1}/');
+      context.Flowerbox.socket.onopen = function() {
+        #{env}
 
-      context.Flowerbox.onQueueStateChange = function(msg) {
-        //console.log(msg);
+        var waitForFinish;
+        waitForFinish = function() {
+          if (!context.Flowerbox.started || !context.Flowerbox.done) {
+            process.nextTick(waitForFinish);
+          } else {
+            process.exit(0);
+          }
+        };
+        waitForFinish();
       };
-
-      context.Flowerbox.startQueueRunner()
-
-      var waitForFinish;
-      waitForFinish = function() {
-        if (!context.Flowerbox.started || !context.Flowerbox.done) {
-          process.nextTick(waitForFinish);
-        } else {
-          process.exit(0);
-        }
-      };
-      waitForFinish();
     }
   };
   fileRunner();

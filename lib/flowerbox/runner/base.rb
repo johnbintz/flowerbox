@@ -140,7 +140,7 @@ module Flowerbox
         server_options[:logging] = true if options[:verbose_server]
         server_options[:port] = Flowerbox.port
 
-        Flowerbox.server = Flowerbox::Server.new(server_options)
+        Flowerbox.server = Flowerbox::Server.new(self, server_options)
       end
 
       def log(message)

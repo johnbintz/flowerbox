@@ -48,19 +48,15 @@ module Flowerbox
     end
 
     command :ping do
-      runner.ping
     end
 
     command :pause_timer do
-      runner.pause_timer
     end
 
     command :unpause_timer do
-      runner.unpause_timer
     end
 
     command :starting do
-      runner.did_start!
     end
 
     get %r{^/__F__/(.*)$} do |file|

@@ -3,16 +3,19 @@ require 'net/http'
 require 'socket'
 require 'rack/builder'
 require 'thin'
-require 'eventmachine'
+require 'em-websocket'
 
 module Flowerbox
   class Server
     attr_reader :options
 
+    attr_reader :runner
+
     class MissingRackApp < StandardError ; end
     class ServerDiedError < StandardError ; end
 
-    def initialize(options = {})
+    def initialize(runner, options = {})
+      @runner = runner
       @options = { :logging => false }.merge(options || {})
     end
 
@@ -22,23 +25,51 @@ module Flowerbox
 
     def start
       @server_thread = Thread.new do
-        server_options = { :Port => port, :Host => interface }
+        EventMachine.run do
+          server_options = { :Port => port, :Host => interface }
 
-        Thin::Logging.silent = !options[:logging]
+          Thin::Logging.silent = !options[:logging]
 
-        rack_app = app
+          rack_app = app
 
-        if options[:logging]
-          rack_app = ::Rack::Builder.new do
-            use ::Rack::CommonLogger, STDOUT
-            run app
+          if options[:logging]
+            rack_app = ::Rack::Builder.new do
+              use ::Rack::CommonLogger, STDOUT
+              run app
+            end
           end
-        end
 
-        ::Rack::Handler::Thin.run(rack_app, server_options) do |server|
-          Thread.current[:server] = server
+          EventMachine::WebSocket.start(:host => interface, :port => port + 1) do |ws|
+            ws.onmessage { |message|
+              command, data = JSON.parse(message)
 
-          trap('QUIT') { server.stop }
+              case command
+              when 'starting'
+                runner.did_start!
+              when 'unpause_timer'
+                runner.unpause_timer
+              when 'pause_timer'
+                runner.pause_timer
+              when 'ping'
+                runner.ping
+              when 'log'
+                runner.log(data.first)
+              when 'finish_test'
+                runner.add_results(data.flatten)
+              when 'start_test'
+                runner.add_tests(data.flatten)
+              when 'results'
+                runner.finish!(data.flatten.first)
+              end
+            }
+          end
+
+
+          ::Rack::Handler::Thin.run(rack_app, server_options) do |server|
+            Thread.current[:server] = server
+
+            trap('QUIT') { server.stop }
+          end
         end
       end
 
@@ -69,7 +100,7 @@ module Flowerbox
       begin
         attempts -= 1
 
-        current_port = random_port
+        current_port = (random_port / 2).floor * 2
 
         begin
           socket = TCPSocket.new(interface, current_port)

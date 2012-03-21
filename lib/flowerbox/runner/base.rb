@@ -59,6 +59,8 @@ module Flowerbox
 
           attempts = 3
 
+          require 'flowerbox/server'
+
           while true
             begin
               server.start

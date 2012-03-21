@@ -4,6 +4,7 @@ require 'socket'
 require 'rack/builder'
 require 'thin'
 require 'em-websocket'
+require 'json'
 
 module Flowerbox
   class Server

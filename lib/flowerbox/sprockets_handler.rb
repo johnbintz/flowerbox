@@ -10,7 +10,7 @@ module Flowerbox
 
     attr_reader :files, :options
 
-    def_delegators :environment, :append_path, :register_engine, :[]
+    def_delegators :environment, :append_path, :register_engine, :[], :call
 
     def self.gem_asset_paths
       @gem_asset_paths ||= Sprockets.find_gem_vendor_paths
@@ -29,7 +29,7 @@ module Flowerbox
     end
 
     def assets_for(asset)
-      environment.find_asset(asset, :bundle => false).to_a
+      environment.find_asset(asset, :bundle => true).to_a
     end
 
     def expire_index!

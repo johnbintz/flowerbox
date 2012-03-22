@@ -131,14 +131,15 @@ module Flowerbox
       def server
         require 'flowerbox/rack'
 
-        Flowerbox::Rack.runner = self
-        Flowerbox::Rack.sprockets = @sprockets
-
-        return Flowerbox.server if Flowerbox.server
+        if Flowerbox.server
+          Flowerbox.server.app.runner = self
+          Flowerbox.server.app.sprockets = sprockets
+          return Flowerbox.server
+        end
 
         require 'flowerbox/server'
 
-        server_options = { :app => Flowerbox::Rack }
+        server_options = { :app => Flowerbox::Rack.new(self, sprockets) }
         server_options[:logging] = true if options[:verbose_server]
         server_options[:port] = Flowerbox.port
 

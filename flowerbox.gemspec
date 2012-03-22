@@ -28,7 +28,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'jasmine-core'
   gem.add_dependency 'thor'
   gem.add_dependency 'selenium-webdriver'
-  gem.add_dependency 'sinatra'
   gem.add_dependency 'rainbow'
   gem.add_dependency 'sprockets'
   gem.add_dependency 'sprockets-vendor_gems'

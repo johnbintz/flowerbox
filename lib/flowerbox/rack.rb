@@ -1,34 +1,20 @@
-require 'sinatra'
-require 'cgi'
-
 module Flowerbox
-  class Rack < Sinatra::Base
-    class << self
-      attr_accessor :runner, :sprockets
+  class Rack
+    attr_accessor :runner, :sprockets
+
+    def initialize(runner, sprockets)
+      @runner, @sprockets = runner, sprockets
     end
 
-    def sprockets
-      self.class.sprockets
+    def call(env)
+      dup._call(env)
     end
 
-    def runner
-      self.class.runner
-    end
-
-    get %r{^/__F__/(.*)$} do |file|
-      asset = sprockets.asset_for(file, :bundle => false)
-
-      halt(404) if !asset
-
-      content_type asset.content_type
-      asset.body
-    end
-
-    get '/' do
-      begin
-        runner.template
-      rescue Flowerbox::Runner::Base::RunnerDiedError => e
-        e.message
+    def _call(env)
+      if sprockets_file = env['PATH_INFO'][%r{/__F__(.*)$}, 1]
+        sprockets.call(env.merge('PATH_INFO' => sprockets_file))
+      else
+        [ 200, { 'Content-type' => 'text/html' }, [ runner.template ] ]
       end
     end
   end

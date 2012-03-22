@@ -40,8 +40,6 @@ module Flowerbox
       return @environment if @environment
 
       @environment = Sprockets::Environment.new
-      FileUtils.rm_rf(Flowerbox.cache_dir)
-
       @environment.cache = Sprockets::Cache::FileStore.new(Flowerbox.cache_dir)
 
       self.class.gem_asset_paths.each { |path| append_path(path) }

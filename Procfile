@@ -1,3 +1,3 @@
-compass: compass watch
 jekyll: jekyll --server
+guard: bundle exec guard
 

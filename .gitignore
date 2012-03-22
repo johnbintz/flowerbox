@@ -1,4 +1,6 @@
 .sass-cache/
 Gemfile.lock
 _site/
+coverage/
+tmp/
 

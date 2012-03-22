@@ -25,11 +25,11 @@ module Flowerbox
     end
 
     def add(asset)
-      paths_for(asset).each { |path| add_paths_for_compiled_asset(path) }
+      assets_for(asset).each { |dependent_asset| @files.add(dependent_asset) }
     end
 
-    def paths_for(asset)
-      environment.find_asset(asset).to_a.collect(&:pathname)
+    def assets_for(asset)
+      environment.find_asset(asset, :bundle => false).to_a
     end
 
     def expire_index!
@@ -50,10 +50,6 @@ module Flowerbox
 
     def asset_for(*args)
       environment.find_asset(*args)
-    end
-
-    def add_paths_for_compiled_asset(path)
-      asset_for(path, :bundle => false).to_a.each { |file_path| @files.add(file_path) }
     end
 
     def logical_path_for(asset)

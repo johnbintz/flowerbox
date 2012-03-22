@@ -81,9 +81,7 @@ module Flowerbox
 
         @results
       rescue ExecJS::RuntimeError => e
-        puts e.message.foreground(:red)
-
-        raise RunnerDiedError.new
+        handle_coffeescript_compilation_error(e)
       end
 
       def configured?
@@ -118,6 +116,8 @@ module Flowerbox
 
       def start_test_environment
         Flowerbox.test_environment.start
+      rescue ExecJS::ProgramError => e
+        handle_coffeescript_compilation_error(e)
       end
 
       def time=(time)
@@ -199,6 +199,13 @@ module Flowerbox
 
       def ping
         @count = 0
+      end
+
+      def handle_coffeescript_compilation_error(exception)
+        puts exception.message.foreground(:red)
+        @finished = true
+
+        raise RunnerDiedError.new(exception.message)
       end
 
       private

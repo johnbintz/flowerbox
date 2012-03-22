@@ -25,9 +25,11 @@ module Flowerbox
     end
 
     get '/' do
-      sprockets.expire_index!
-
-      runner.template
+      begin
+        runner.template
+      rescue Flowerbox::Runner::Base::RunnerDiedError => e
+        e.message
+      end
     end
   end
 end

@@ -1,8 +1,13 @@
 ---
-title: Hi
+title: Flowerbox -- a multi-environment, multi-runner JavaScript testing framework framework.
 layout: default
 ---
-Flowerbox
+# Flowerbox
+## A multi-environment, multi-runner JavaScript testing framework framework.
 
-Test
+## Getting started
 
+{% highlight sh %}
+gem install flowerbox
+
+{% endhighlight %}

@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
 
+if !ENV['BUNDLE_GEMFILE'] && File.file?('Gemfile')
+  require 'bundler/setup'
+
+  $: << File.expand_path('../../lib', __FILE__)
+end
+
 require 'flowerbox'
 require 'thor'
 

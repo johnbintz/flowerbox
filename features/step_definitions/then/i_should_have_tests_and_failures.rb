@@ -1,7 +1,9 @@
-Then /^I should have (\d+) tests? and (\d+) failures?$/ do |tests, failures|
-  parts = @output.lines.to_a.last.strip.split('/')
+require 'json'
 
-  parts[0].should == tests
-  parts[1].should == failures
+Then /^I should have (\d+) tests? and (\d+) failures?$/ do |tests, failures|
+  results = JSON.parse(@output).last.last
+
+  results['total'].should == tests.to_i
+  results['failures'].should == failures.to_i
 end
 

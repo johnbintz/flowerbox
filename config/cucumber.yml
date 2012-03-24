@@ -1,0 +1,2 @@
+default: -f pretty
+wip: --tags @wip -f pretty

@@ -25,7 +25,7 @@ class Flowerbox::CLI < Thor
   end
 
   desc "test [DIR]", "Run the specs found in spec dir, loading spec_helper.rb for configuration details"
-  method_options :pwd => :string, :env_options => nil, :runners => :string, :runner => :string, :verbose_server => false
+  method_options :pwd => :string, [:quiet, '-q'] => false, :env_options => nil, :runners => :string, :runner => :string, :verbose_server => false
   def test(dir = "spec/javascripts", *files)
     Dir.chdir(pwd) do
       result = Flowerbox.run(dir, options.dup.merge(:files => files))

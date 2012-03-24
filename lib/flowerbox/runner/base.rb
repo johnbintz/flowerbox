@@ -24,6 +24,14 @@ module Flowerbox
         @started
       end
 
+      def starting(*args)
+        @started = true
+      end
+
+      def reporters
+        Flowerbox.reporters
+      end
+
       def ensure_alive
         while @count < MAX_COUNT && !finished?
           @count += 1 if @timer_running
@@ -31,8 +39,8 @@ module Flowerbox
         end
 
         if !finished?
-          puts "Something died hard. Here are the tests that did get run before Flowerbox died.".foreground(:red)
-          puts tests.flatten.join("\n").foreground(:red)
+          Flowerbox.notify "Something died hard. Here are the tests that did get run before Flowerbox died.".foreground(:red)
+          Flowerbox.notify tests.flatten.join("\n").foreground(:red)
           server.stop
           Flowerbox.server = nil
 
@@ -55,7 +63,7 @@ module Flowerbox
           @count = 0
           @timer_running = true
 
-          puts "Flowerbox running your #{Flowerbox.test_environment.name} tests on #{console_name}..."
+          reporters.start("Flowerbox running your #{Flowerbox.test_environment.name} tests on #{console_name}...")
 
           attempts = 3
 
@@ -90,12 +98,12 @@ module Flowerbox
 
       def configure ; end
 
-      def pause_timer
+      def pause_timer(*args)
         @timer_running = false
         @count = 0
       end
 
-      def unpause_timer
+      def unpause_timer(*args)
         @timer_running = true
       end
 
@@ -105,7 +113,7 @@ module Flowerbox
 
       def ensure_configured!
         if !configured?
-          puts "#{console_name} is not configured for this project, configuring now..."
+          Flowerbox.notify "#{console_name} is not configured for this project, configuring now..."
           configure
         end
       end
@@ -122,10 +130,6 @@ module Flowerbox
 
       def time=(time)
         @results.time = time
-      end
-
-      def did_start!
-        @started = true
       end
 
       def server
@@ -147,17 +151,17 @@ module Flowerbox
       end
 
       def log(message)
-        puts message
+        reporters.log(message)
       end
 
       def tests
         @tests ||= []
       end
 
-      def add_tests(new_tests)
+      def start_test(new_tests)
         tests << new_tests
 
-        puts new_tests.flatten if options[:verbose_server]
+        Flowerbox.notify(new_tests.flatten) if options[:verbose_server]
 
         @count = 0
       end
@@ -166,7 +170,7 @@ module Flowerbox
         @failures ||= []
       end
 
-      def add_results(test_results)
+      def finish_test(test_results)
         results = result_set_from_test_results(test_results)
 
         results.print_progress
@@ -188,8 +192,8 @@ module Flowerbox
         @time ||= 0
       end
 
-      def finish!(time)
-        @time = time
+      def results(time)
+        @time = time.first
 
         @finished = true
       end
@@ -203,7 +207,7 @@ module Flowerbox
       end
 
       def handle_coffeescript_compilation_error(exception)
-        puts exception.message.foreground(:red)
+        Flowerbox.notify(exception.message.foreground(:red))
         @finished = true
 
         raise RunnerDiedError.new(exception.message)

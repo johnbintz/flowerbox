@@ -26,6 +26,8 @@ module Flowerbox
   CACHE_DIR = 'tmp/sprockets'
 
   class << self
+    attr_writer :quiet
+
     def reset!
       @configuration = nil
     end
@@ -51,7 +53,19 @@ module Flowerbox
     end
 
     def run(dir, options = {})
+      Flowerbox.quiet = options[:quiet]
+
       Flowerbox::Run::Test.execute(dir, options)
+    end
+
+    def quiet?
+      @quiet == true
+    end
+
+    def notify(msg)
+      if !Flowerbox.quiet?
+        puts msg
+      end
     end
 
     def browsers

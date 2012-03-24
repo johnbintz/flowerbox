@@ -13,10 +13,8 @@ Feature: Basic Run
       """
     Given I have the file "lib/cat.js.coffee" with the content:
       """
-      class Cat
+      class @Cat
         meow: -> "meow"
-
-      console.log("made it")
       """
 
   Scenario: Use the Node runner using Jasmine
@@ -28,27 +26,25 @@ Feature: Basic Run
 
         c.spec_patterns << "**/*_spec.*"
         c.asset_paths << "lib"
-        c.bare_coffeescript = true
 
-        c.test_environment.reporters << "SimpleNodeReporter"
+        c.reporters << :json
       end
       """
     When I run Flowerbox with "spec/javascripts"
     Then I should have 1 test and 0 failures
 
+  @wip
   Scenario: Use the Selenium runner using Jasmine
     Given I have the file "spec/javascripts/spec_helper.rb" with the content:
       """
       Flowerbox.configure do |c|
         c.test_with :jasmine
-        c.run_with :selenium
-        c.runner_environment.browser = :firefox
+        c.run_with :chrome
 
         c.spec_patterns << "**/*_spec.*"
         c.asset_paths << "lib"
-        c.bare_coffeescript = true
 
-        c.test_environment.reporters << "SimpleSeleniumReporter"
+        c.reporters << :json
       end
       """
     When I run Flowerbox with "spec/javascripts"

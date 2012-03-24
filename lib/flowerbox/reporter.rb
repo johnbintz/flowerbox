@@ -4,10 +4,11 @@ module Flowerbox
 
     require 'flowerbox/reporter/file_display'
 
-    require 'flowerbox/reporter/base'
-    require 'flowerbox/reporter/console_base'
-    require 'flowerbox/reporter/verbose'
-    require 'flowerbox/reporter/progress'
+    def self.for(env)
+      require "flowerbox/reporter/#{env}"
+
+      find_constant(env).new
+    end
   end
 end
 

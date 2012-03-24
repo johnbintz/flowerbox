@@ -47,7 +47,7 @@ module Flowerbox
       end
 
       def actual_path_for(file)
-        @sprockets.asset_for(file, :bundle => false).pathname.to_s
+        @sprockets.find_asset(file, :bundle => false).pathname.to_s
       end
     end
   end

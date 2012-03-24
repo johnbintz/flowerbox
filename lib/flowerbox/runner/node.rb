@@ -28,7 +28,7 @@ module Flowerbox
       def cleanup ; end
 
       def configure
-        system %{bash -c "mkdir -p node_modules && npm link jsdom && npm link ws"}
+        Flowerbox.notify %x{bash -c "mkdir -p node_modules && npm link jsdom && npm link ws"}
       end
 
       def run(sprockets, spec_files, options)

@@ -8,46 +8,89 @@ describe Flowerbox::SprocketsHandler do
 
   describe '#add' do
     let(:asset) { 'asset' }
-    let(:path) { 'path' }
-    let(:paths) { [ path ] }
+    let(:dependent_asset) { 'dependent' }
 
     let(:pathname_path) { 'pathname path' }
+    let(:files) { stub }
 
     before do
-      sprockets_handler.expects(:paths_for).with(asset).returns(paths)
-      sprockets_handler.expects(:path_for_compiled_asset).with(path).returns(pathname_path)
+      sprockets_handler.expects(:assets_for).with(asset).returns([ dependent_asset ])
+      sprockets_handler.stubs(:files).returns(files)
+      files.expects(:add).with(dependent_asset)
     end
 
     it 'should add the asset to the list of ones to work with' do
       sprockets_handler.add(asset)
-
-      sprockets_handler.files.should == [ pathname_path ]
     end
-  end
-
-  describe '#paths_for' do
-    subject { sprockets_handler.paths_for(asset) }
-
-    let(:asset) { 'asset' }
-    let(:environment) { stub }
-    let(:bundled_asset) { stub(:to_a => [ processed_asset ]) }
-    let(:processed_asset) { stub(:pathname => path) }
-
-    let(:path) { 'path' }
-
-    before do
-      sprockets_handler.stubs(:environment).returns(environment)
-      environment.expects(:find_asset).with(asset).returns(bundled_asset)
-    end
-
-    it { should == [ path ] }
   end
 
   describe '#environment' do
+    let(:cache) { stub }
+
+    before do
+      sprockets_handler.stubs(:cache).returns(cache)
+      sprockets_handler.stubs(:default_asset_paths).returns([])
+    end
+
     subject { sprockets_handler.environment }
 
     it { should be_a_kind_of(Sprockets::Environment) }
-    its(:paths) { should == asset_paths }
+  end
+
+  describe '#default_asset_paths' do
+    let(:gem) { 'gem' }
+    let(:asset) { 'asset' }
+
+    before do
+      described_class.stubs(:gem_asset_paths).returns([ gem ])
+      sprockets_handler.stubs(:options).returns(:asset_paths => [ asset ])
+    end
+
+    subject { sprockets_handler.default_asset_paths }
+
+    it { should == [ gem, asset ] }
+  end
+
+  describe '#assets_for' do
+    subject { sprockets_handler.assets_for(asset) }
+
+    let(:asset) { 'asset' }
+    let(:found_asset) { 'found asset' }
+    let(:other_asset) { 'other asset' }
+
+    before do
+      sprockets_handler.stubs(:find_asset).returns(found_asset)
+      found_asset.stubs(:to_a).returns(other_asset)
+    end
+
+    it { should == other_asset }
+  end
+
+  describe '#logical_path_for' do
+    subject { sprockets_handler.logical_path_for(asset) }
+
+    let(:path) { 'path' }
+    let(:result) { 'result' }
+
+    let(:asset) { stub(:pathname => Pathname("#{path}/#{result}")) }
+
+    before do
+      sprockets_handler.stubs(:paths).returns(paths)
+    end
+
+    context 'found' do
+      let(:paths) { [ path ] }
+
+      it { should == result }
+    end
+
+    context 'not found' do
+      let(:paths) { [] }
+
+      it 'should raise an exception' do
+        expect { subject }.to raise_error(Flowerbox::SprocketsHandler::LogicalPathNotFoundError)
+      end
+    end
   end
 end
 

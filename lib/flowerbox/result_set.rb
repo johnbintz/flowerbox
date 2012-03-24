@@ -64,7 +64,15 @@ module Flowerbox
 
     def print_progress
       @results.each do |result|
-        reporters.each { |reporter| reporter.report_progress(result) }
+        reporters.each do |reporter|
+          begin
+            reporter.report_progress(result)
+          rescue => e
+            puts e.message
+            puts e.backtrace.join("\n")
+            raise e
+          end
+        end
       end
     end
 

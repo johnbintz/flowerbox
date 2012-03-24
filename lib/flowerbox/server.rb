@@ -24,52 +24,46 @@ module Flowerbox
       options[:app] || raise(MissingRackApp.new)
     end
 
+    def rack_app
+      Thin::Logging.silent = !options[:logging]
+
+      rack_app = app
+
+      if options[:logging]
+        rack_app = ::Rack::Builder.new do
+          use ::Rack::CommonLogger, STDOUT
+          run app
+        end
+      end
+
+      rack_app
+    end
+
+    def websocket_app(ws)
+      ws.onmessage { |message|
+        command, data = JSON.parse(message)
+
+        runner.send(command, data.flatten)
+      }
+    end
+
     def start
       @server_thread = Thread.new do
-        EventMachine.run do
-          server_options = { :Port => port, :Host => interface }
+        begin
+          EventMachine.run do
+            server_options = { :Port => port, :Host => interface }
 
-          Thin::Logging.silent = !options[:logging]
+            EventMachine::WebSocket.start(:host => interface, :port => port + 1, &method(:websocket_app))
 
-          rack_app = app
+            ::Rack::Handler::Thin.run(rack_app, server_options) do |server|
+              Thread.current[:server] = server
 
-          if options[:logging]
-            rack_app = ::Rack::Builder.new do
-              use ::Rack::CommonLogger, STDOUT
-              run app
+              trap('QUIT') { server.stop }
             end
           end
-
-          EventMachine::WebSocket.start(:host => interface, :port => port + 1) do |ws|
-            ws.onmessage { |message|
-              command, data = JSON.parse(message)
-
-              case command
-              when 'starting'
-                runner.did_start!
-              when 'unpause_timer'
-                runner.unpause_timer
-              when 'pause_timer'
-                runner.pause_timer
-              when 'ping'
-                runner.ping
-              when 'log'
-                runner.log(data.first)
-              when 'finish_test'
-                runner.add_results(data.flatten)
-              when 'start_test'
-                runner.add_tests(data.flatten)
-              when 'results'
-                runner.finish!(data.flatten.first)
-              end
-            }
-          end
-
-          ::Rack::Handler::Thin.run(rack_app, server_options) do |server|
-            Thread.current[:server] = server
-
-            trap('QUIT') { server.stop }
-          end
+        rescue => e
+          @server_thread[:exception] = e
+          raise e
         end
       end
 
@@ -77,12 +71,16 @@ module Flowerbox
         sleep 0.1
       end
 
-      raise ServerDiedError.new if !@server_thread[:server].running?
+      if @server_thread[:exception]
+        raise @server_thread[:exception]
+      else
+        raise ServerDiedError.new if !@server_thread.alive?
+      end
     end
 
     def stop
       if @server_thread
-        @server_thread[:server].stop
+        @server_thread[:server].stop rescue nil
 
         wait_for_server_to_stop
       end

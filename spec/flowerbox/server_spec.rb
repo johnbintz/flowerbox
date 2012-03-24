@@ -5,8 +5,9 @@ require 'thread'
 require 'flowerbox/server'
 
 describe Flowerbox::Server do
-  let(:server) { described_class.new(options) }
+  let(:server) { described_class.new(runner, options) }
   let(:options) { nil }
+  let(:runner) { nil }
 
   subject { server }
 
@@ -50,6 +51,7 @@ describe Flowerbox::Server do
     before do
       server.stubs(:port).returns(port)
       server.stubs(:interface).returns(interface)
+      server.stubs(:app).returns(lambda { |env| [ 200, {}, [] ] })
     end
 
     it 'should start a Rack server' do
@@ -104,18 +106,21 @@ describe Flowerbox::Server do
           TCPServer.new(interface, initial)
         end
 
-        server.stubs(:random_port).returns(initial, initial + 1)
+        server.stubs(:random_port).returns(initial, initial + 2)
 
-        while true
+        count = 10
+        while count > 0
           begin
             TCPSocket.new(interface, initial)
             break
           rescue Errno::ECONNREFUSED
+            count -= 1
+            sleep 0.1
           end
         end
       end
 
-      it { should == initial + 1 }
+      it { should == initial + 2 }
 
       after do
         @server.kill

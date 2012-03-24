@@ -2,6 +2,10 @@ module Flowerbox::Reporter
   class ConsoleBase < Base
     include FileDisplay
 
+    def start(message)
+      self.puts message
+    end
+
     def report_success(result) ; end
     def report_skipped(result) ; end
 

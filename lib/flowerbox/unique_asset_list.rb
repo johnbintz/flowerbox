@@ -18,6 +18,7 @@ module Flowerbox
 
     def <<(file)
       super(file)
+
       @included[file.pathname.to_s] = true
     end
 
@@ -25,7 +26,6 @@ module Flowerbox
       collect { |file| sprockets.logical_path_for(file) }
     end
 
-    private
     def included?(file)
       @included[file.pathname.to_s]
     end

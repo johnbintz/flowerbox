@@ -9,10 +9,11 @@ Flowerbox =
 
   contact: (url, data...) ->
     Flowerbox.started = true
-    Flowerbox.done = true if url == 'results'
 
     if !Flowerbox.debug
       Flowerbox.socket.send(JSON.stringify([ url, data ]))
+
+    Flowerbox.done = true if url == 'results'
 
   started: false
   done: false

@@ -1,3 +1,5 @@
+require 'flowerbox/reporter_list'
+
 module Flowerbox
   class Configuration
     attr_writer :reporters, :backtrace_filter
@@ -14,7 +16,7 @@ module Flowerbox
     end
 
     def reporters
-      @reporters ||= []
+      @reporters ||= Flowerbox::ReporterList.new
     end
 
     def additional_files
@@ -34,7 +36,8 @@ module Flowerbox
     end
 
     def report_with(*whats)
-      self.reporters = whats.flatten.collect { |what| Flowerbox::Reporter.for(what.to_s) }
+      self.reporters.clear!
+      whats.each { |what| self.reporters << what }
     end
 
     def configure

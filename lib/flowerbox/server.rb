@@ -10,7 +10,7 @@ module Flowerbox
   class Server
     attr_reader :options
 
-    attr_reader :runner
+    attr_accessor :runner
 
     class MissingRackApp < StandardError ; end
     class ServerDiedError < StandardError ; end
@@ -83,6 +83,8 @@ module Flowerbox
     def stop
       if @server_thread
         @server_thread[:server].stop rescue nil
+        EventMachine.stop_event_loop
+        @server_thread.kill
 
         wait_for_server_to_stop
       end
@@ -93,7 +95,12 @@ module Flowerbox
     end
 
     def port
-      return @port if @port ||= options[:port]
+      return @port if @port
+
+      if options[:port]
+        @port = options[:port]
+        return @port
+      end
 
       attempts = 20
 

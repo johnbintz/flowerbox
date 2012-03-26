@@ -140,6 +140,7 @@ module Flowerbox
         require 'flowerbox/rack'
 
         if Flowerbox.server
+          Flowerbox.server.runner = self
           Flowerbox.server.app.runner = self
           Flowerbox.server.app.sprockets = sprockets
           return Flowerbox.server

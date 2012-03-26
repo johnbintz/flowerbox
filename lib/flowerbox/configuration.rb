@@ -5,7 +5,7 @@ module Flowerbox
     attr_writer :reporters, :backtrace_filter
     attr_accessor :port
 
-    attr_accessor :test_environment, :runner_environment, :bare_coffeescript, :server
+    attr_accessor :test_environment, :runner_environment, :bare_coffeescript
 
     def spec_patterns
       @spec_patterns ||= []

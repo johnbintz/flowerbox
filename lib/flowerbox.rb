@@ -27,6 +27,7 @@ module Flowerbox
 
   class << self
     attr_writer :quiet
+    attr_accessor :server
 
     def reset!
       @configuration = nil

@@ -33,7 +33,7 @@ module Flowerbox
     end
 
     def instrument_js?
-      !@instrument_files.empty?
+      !instrument_files.empty?
     end
 
     def test_with(what)

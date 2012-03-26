@@ -38,7 +38,6 @@ module Flowerbox
       return @environment if @environment
 
       @environment = Sprockets::Environment.new
-      @environment.cache = cache
 
       if Flowerbox.instrument_js?
         require 'flowerbox/tilt/instrument_js'

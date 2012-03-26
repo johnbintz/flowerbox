@@ -37,6 +37,15 @@ module Flowerbox
       end
 
       def instrument(data)
+        results = []
+
+        data.flatten.first.each do |filename, lines|
+          results += lines.reject { |line| line == nil }
+        end
+
+        visited = results.find_all { |result| result == 1 }.length
+
+        Flowerbox.notify "Coverage: %d/%d lines (%0.2f%% of instrumented code)" % [ visited, results.length, (visited.to_f / results.length.to_f) * 100 ]
       end
 
       def ensure_alive
@@ -97,7 +106,7 @@ module Flowerbox
         @results
       rescue => e
         case e
-        when ExecJS::RuntimeError, ExecJS::ProgramError
+        when ExecJS::RuntimeError, ExecJS::ProgramError, Sprockets::FileNotFound
           handle_coffeescript_compilation_error(e)
         else
           raise e

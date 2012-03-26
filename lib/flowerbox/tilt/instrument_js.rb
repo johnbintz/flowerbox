@@ -14,11 +14,14 @@ module Flowerbox
           output = [
             'if (typeof __$instrument == "undefined") { __$instrument = {} }',
             "__$instrument['#{file}'] = [];",
-            "__$instrument['#{file}'][#{lines.length - 1}] = 0;"
+            "__$instrument['#{file}'][#{lines.length - 1}] = null;"
           ]
 
           prior_comma_end = comma_end = false
 
+          lines_instrumented = []
+
+          code_output = []
           lines.each_with_index do |line, index|
             line.rstrip!
 
@@ -26,12 +29,17 @@ module Flowerbox
 
             if line[%r{; *$}]
               line = line + instrument
+              lines_instrumented << index
             end
 
-            output << line
+            code_output << line
           end
 
-          output.join("\n")
+          lines_instrumented.each do |line|
+            output << "__$instrument['#{file}'][#{line}] = 0;"
+          end
+
+          (output + code_output).join("\n")
         else
           data
         end

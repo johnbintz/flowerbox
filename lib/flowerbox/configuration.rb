@@ -1,8 +1,9 @@
 require 'flowerbox/reporter_list'
+require 'flowerbox/instrumented_files_list'
 
 module Flowerbox
   class Configuration
-    attr_writer :reporters, :backtrace_filter
+    attr_writer :reporters, :backtrace_filter, :instrument_js
     attr_accessor :port
 
     attr_accessor :test_environment, :runner_environment, :bare_coffeescript
@@ -25,6 +26,14 @@ module Flowerbox
 
     def backtrace_filter
       @backtrace_filter ||= []
+    end
+
+    def instrument_files
+      @instrument_files ||= Flowerbox::InstrumentedFilesList.new
+    end
+
+    def instrument_js?
+      !@instrument_files.empty?
     end
 
     def test_with(what)

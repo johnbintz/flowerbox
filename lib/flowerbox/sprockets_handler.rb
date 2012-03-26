@@ -40,6 +40,12 @@ module Flowerbox
       @environment = Sprockets::Environment.new
       @environment.cache = cache
 
+      if Flowerbox.instrument_js?
+        require 'flowerbox/tilt/instrument_js'
+
+        @environment.register_postprocessor 'application/javascript', Flowerbox::Tilt::InstrumentJS
+      end
+
       default_asset_paths.each { |path| @environment.append_path(path) }
 
       @environment

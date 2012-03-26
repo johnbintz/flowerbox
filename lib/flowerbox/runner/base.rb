@@ -36,6 +36,9 @@ module Flowerbox
         sprockets.find_asset(file.first, :bundle => false).body
       end
 
+      def instrument(data)
+      end
+
       def ensure_alive
         while @count < MAX_COUNT && !finished?
           @count += 1 if @timer_running
@@ -92,8 +95,13 @@ module Flowerbox
         end
 
         @results
-      rescue ExecJS::RuntimeError => e
-        handle_coffeescript_compilation_error(e)
+      rescue => e
+        case e
+        when ExecJS::RuntimeError, ExecJS::ProgramError
+          handle_coffeescript_compilation_error(e)
+        else
+          raise e
+        end
       end
 
       def configured?

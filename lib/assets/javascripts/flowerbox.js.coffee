@@ -21,7 +21,11 @@ Flowerbox =
           message = Flowerbox.messageQueue.shift()
           Flowerbox.socket.send(JSON.stringify(message))
 
-    Flowerbox.done = true if url == 'results'
+    if url == 'results'
+      if __$instrument?
+        Flowerbox.socket.send(JSON.stringify(['instrument', __$instrument]))
+
+      Flowerbox.done = true
 
   started: false
   done: false

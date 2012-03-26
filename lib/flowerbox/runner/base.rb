@@ -32,6 +32,10 @@ module Flowerbox
         Flowerbox.reporters
       end
 
+      def load(file)
+        sprockets.find_asset(file.first, :bundle => false).body
+      end
+
       def ensure_alive
         while @count < MAX_COUNT && !finished?
           @count += 1 if @timer_running

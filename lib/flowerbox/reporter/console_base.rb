@@ -1,3 +1,5 @@
+require 'flowerbox/reporter/base'
+
 module Flowerbox::Reporter
   class ConsoleBase < Base
     include FileDisplay

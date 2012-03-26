@@ -43,7 +43,9 @@ module Flowerbox
       ws.onmessage { |message|
         command, data = JSON.parse(message)
 
-        runner.send(command, data.flatten)
+        output = runner.send(command, [ data ].flatten)
+
+        ws.send(output) if command == 'load'
       }
     end
 

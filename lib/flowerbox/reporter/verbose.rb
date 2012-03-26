@@ -1,3 +1,5 @@
+require 'flowerbox/reporter/console_base'
+
 module Flowerbox::Reporter
   class Verbose < ConsoleBase
     def initialize

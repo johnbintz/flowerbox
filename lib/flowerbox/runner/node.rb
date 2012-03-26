@@ -66,27 +66,16 @@ jsdom.env(
 
   var gotFlowerbox = false;
 
-  var files = #{sprockets.files.to_json};
-  var fileRunner = function() {
-    if (files.length > 0) {
-      var file = files.shift();
+  var socket = new ws('ws://localhost:#{server.port + 1}/');
+  socket.onopen = function() {
+    var files = #{sprockets.files.to_json};
 
-      var options = {
-        host: "localhost",
-        port: #{server.port},
-        path: "/__F__/" + file,
-        method: "GET"
-      };
+    var fileLoader = function() {
+      if (files.length > 0) {
+        var file = files.shift();
 
-      var request = http.request(options, function(response) {
-        var data = '';
-
-        response.on('data', function(chunk) {
-          data += chunk;
-        });
-
-        response.on('end', function() {
-          vm.runInNewContext(data, context, file);
+        socket.onmessage = function(data) {
+          vm.runInNewContext(data.data, context, file);
 
           for (thing in window) {
             if (!context[thing]) { context[thing] = window[thing] }
@@ -95,18 +84,18 @@ jsdom.env(
           if (!gotFlowerbox && context.Flowerbox) {
             context.Flowerbox.environment = 'node';
             context.Flowerbox.UNKNOWN = '#{Flowerbox::Result::FileInfo::UNKNOWN}';
+            context.Flowerbox.socket = socket;
 
             gotFlowerbox = true;
           }
 
-          fileRunner();
-        });
-      });
+          fileLoader();
+        };
 
-      request.end();
-    } else {
-      context.Flowerbox.socket = new ws('ws://localhost:#{server.port + 1}/');
-      context.Flowerbox.socket.onopen = function() {
+        socket.send(JSON.stringify(['load', file]));
+      } else {
+        socket.onmessage = null;
+
         #{env}
 
         var waitForFinish;
@@ -118,10 +107,11 @@ jsdom.env(
           }
         };
         waitForFinish();
-      };
-    }
+      }
+    };
+
+    fileLoader();
   };
-  fileRunner();
 });
 JS
       end

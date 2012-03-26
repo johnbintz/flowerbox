@@ -7,11 +7,19 @@ Flowerbox =
   ping: ->
     Flowerbox.contact('ping')
 
+  messageQueue: []
+
   contact: (url, data...) ->
     Flowerbox.started = true
 
     if !Flowerbox.debug
-      Flowerbox.socket.send(JSON.stringify([ url, data ]))
+      message = [ url, data ]
+      Flowerbox.messageQueue.push(message)
+
+      if Flowerbox.socket
+        while Flowerbox.messageQueue.length > 0
+          message = Flowerbox.messageQueue.shift()
+          Flowerbox.socket.send(JSON.stringify(message))
 
     Flowerbox.done = true if url == 'results'
 

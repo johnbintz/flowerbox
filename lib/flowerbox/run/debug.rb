@@ -6,7 +6,7 @@ module Flowerbox::Run
       env = Flowerbox.runner_environment.first
       env.setup(sprockets, spec_files, options)
 
-      Flowerbox.reporters.replace([])
+      Flowerbox.reporters.clear!
 
       puts "Flowerbox debug server running test prepared for #{env.console_name} on #{env.server.address}"
 

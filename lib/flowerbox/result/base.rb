@@ -13,7 +13,7 @@ module Flowerbox
       def_delegators :data, :[]
 
       def type
-        self.class.name.split("::").last.downcase.to_sym
+        @type ||= self.class.name.split("::").last.downcase.to_sym
       end
 
       def initialize(data)
@@ -41,13 +41,7 @@ module Flowerbox
       end
 
       def <=>(other)
-        result = self.name.length <=> other.name.length
-
-        if result == 0
-
-        end
-
-        result
+        self.name.length <=> other.name.length
       end
 
       def runners

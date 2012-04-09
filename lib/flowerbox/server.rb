@@ -5,15 +5,19 @@ require 'rack/builder'
 require 'thin'
 require 'em-websocket'
 require 'json'
+require 'forwardable'
 
 module Flowerbox
   class Server
     attr_reader :options
-
     attr_accessor :runner
 
     class MissingRackApp < StandardError ; end
     class ServerDiedError < StandardError ; end
+
+    extend Forwardable
+
+    def_delegators :@server_thread, :alive?
 
     def initialize(runner, options = {})
       @runner = runner
@@ -52,9 +56,9 @@ module Flowerbox
     def start
       @server_thread = Thread.new do
         begin
-          EventMachine.run do
-            server_options = { :Port => port, :Host => interface }
+          server_options = { :Port => port, :Host => interface }
 
+          EventMachine.run do
             EventMachine::WebSocket.start(:host => interface, :port => port + 1, &method(:websocket_app))
 
             ::Rack::Handler::Thin.run(rack_app, server_options) do |server|
@@ -65,18 +69,19 @@ module Flowerbox
           end
         rescue => e
           @server_thread[:exception] = e
+
           raise e
         end
       end
 
-      while !@server_thread[:server] && @server_thread.alive?
+      while !@server_thread[:server] && alive?
         sleep 0.1
       end
 
       if @server_thread[:exception]
         raise @server_thread[:exception]
       else
-        raise ServerDiedError.new if !@server_thread.alive?
+        raise ServerDiedError.new if !alive?
       end
     end
 
@@ -98,24 +103,16 @@ module Flowerbox
       return @port if @port
 
       if options[:port]
-        @port = options[:port]
-        return @port
+        return @port = options[:port]
       end
 
       attempts = 20
 
       begin
+        try_server_to_something(nil, Proc.new { |port| @port = port }, (random_port / 2).floor * 2)
+
         attempts -= 1
-
-        current_port = (random_port / 2).floor * 2
-
-        begin
-          socket = TCPSocket.new(interface, current_port)
-          socket.close
-        rescue Errno::ECONNREFUSED => e
-          @port = current_port
-        end
-      end while !@port and attempts > 0
+      end while !@port and attempts != 0
 
       raise StandardError.new("can't start server") if attempts == 0
 
@@ -123,41 +120,42 @@ module Flowerbox
     end
 
     def address
-      "http://#{interface}:#{port}/"
-    end
-
-    def alive?
-      @server_thread.alive?
+      @address ||= "http://#{interface}:#{port}/"
     end
 
     private
     def wait_for_server_to_start
-      while true do
-        begin
-          connect_interface = '127.0.0.1' if interface == '0.0.0.0'
+      started = false
 
-          TCPSocket.new(connect_interface, port)
-          break
-        rescue Errno::ECONNREFUSED => e
-        end
-
-        sleep 0.1
+      while !started do
+        try_server_to_something(Proc.new { started = true })
       end
     end
 
     def wait_for_server_to_stop
       while alive? do
-        begin
-          connect_interface = '127.0.0.1' if interface == '0.0.0.0'
-
-          socket = TCPSocket.new(connect_interface, port)
-          socket.close
-        rescue Errno::ECONNREFUSED => e
-          return
-        end
-
-        sleep 0.1
+        try_server_to_something(nil, Proc.new { return })
       end
+    end
+
+    def try_server_to_something(success, failure = nil, current_port = port)
+      begin
+        connect_interface = '127.0.0.1' if interface == '0.0.0.0'
+
+        socket = TCPSocket.new(connect_interface, current_port)
+        socket.close
+
+        success.call(current_port) if success
+      rescue => e
+        case e
+        when Errno::ECONNREFUSED, Errno::ECONNRESET
+          failure.call(current_port) if failure
+        else
+          raise e
+        end
+      end
+
+      sleep 0.1
     end
 
     def random_port

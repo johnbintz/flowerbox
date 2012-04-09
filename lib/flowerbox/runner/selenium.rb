@@ -40,16 +40,20 @@ module Flowerbox
         puts msg
       end
 
+      def page_title
+        "Flowerbox - #{Flowerbox.test_environment.name} Runner"
+      end
+
       def template
         env = start_test_environment
 
         <<-HTML
 <html>
   <head>
-    <title>Flowerbox - #{Flowerbox.test_environment.name} Runner</title>
+    <title>#{page_title}</title>
   </head>
   <body>
-    <h1>Flowerbox - #{Flowerbox.test_environment.name} Runner</h1>
+    <h1>#{page_title}</h1>
     <pre id="queue"></pre>
     <script type="text/javascript">
 console._log = console.log;

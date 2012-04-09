@@ -16,19 +16,24 @@ Flowerbox =
       message = [ url, data ]
       Flowerbox.messageQueue.push(message)
 
-      if Flowerbox.socket
-        while Flowerbox.messageQueue.length > 0
-          message = Flowerbox.messageQueue.shift()
-          Flowerbox.socket.send(JSON.stringify(message))
-
-    if url == 'results'
-      if __$instrument?
-        Flowerbox.socket.send(JSON.stringify(['instrument', __$instrument]))
-
-      Flowerbox.done = true
+      Flowerbox.queuePuller() if Flowerbox.socket
 
   started: false
   done: false
+
+  queuePuller: ->
+    if Flowerbox.messageQueue.length > 0
+      message = Flowerbox.messageQueue.shift()
+
+      Flowerbox.socket.send JSON.stringify(message), {}, ->
+        if message[0] == 'results'
+          if __$instrument?
+            Flowerbox.socket.send JSON.stringify(['instrument', __$instrument]) {}, ->
+              Flowerbox.done = true
+          else
+            Flowerbox.done = true
+
+        Flowerbox.queuePuller()
 
   fail: ->
 

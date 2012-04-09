@@ -38,6 +38,15 @@ module Flowerbox
             File.open(file, 'wb') { |fh| fh.print template }
 
             system %{node #{file}}
+
+            if $?.exitstatus == 0
+              count = 20
+              while !finished? && count > 0
+                sleep 0.1
+
+                count -= 1
+              end
+            end
           ensure
             File.unlink(file) if file
           end
@@ -65,6 +74,8 @@ jsdom.env(
   context.WebSocket = ws;
 
   var gotFlowerbox = false;
+
+  console._log = console.log;
 
   var socket = new ws('ws://localhost:#{server.port + 1}/');
   socket.onopen = function() {

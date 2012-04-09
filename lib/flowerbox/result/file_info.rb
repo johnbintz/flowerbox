@@ -25,7 +25,7 @@ module Flowerbox::Result::FileInfo
     return @line_number if @line_number
 
     @line_number = file.to_s.split(":")[1]
-    @line_number = "~#{(@line_number.to_i * 0.67).to_i}" if file_translated?
+    @line_number = "~#{coffeescript_line_to_js_line(@line_number)}" if file_translated?
     @line_number ||= "0"
   end
 
@@ -37,6 +37,16 @@ module Flowerbox::Result::FileInfo
 
   def system_files
     Flowerbox.test_environment.system_files
+  end
+
+  def filter_coffeescript_lines(lines)
+    [ lines ].flatten.collect { |line|
+      line.gsub(%r{\.coffee:(\d+)}) { |_| ".coffee:~#{coffeescript_line_to_js_line($1)}" }
+    }
+  end
+
+  def coffeescript_line_to_js_line(number)
+    (number.to_i * 0.67 + 1).to_i
   end
 end
 

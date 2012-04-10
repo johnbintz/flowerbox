@@ -66,3 +66,85 @@ a img {
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, summary {
   display: block;
 }
+
+/* line 15, ../sass/screen.scss */
+body {
+  background-color: #d9b741;
+}
+
+/* line 19, ../sass/screen.scss */
+#container {
+  width: 550px;
+  margin: 0 auto;
+}
+
+/* line 24, ../sass/screen.scss */
+h1, h2 {
+  font-weight: bold;
+}
+
+/* line 28, ../sass/screen.scss */
+h1 {
+  font-size: 1.75em;
+  margin: 0.35em 0;
+  color: #050916;
+}
+
+/* line 34, ../sass/screen.scss */
+h2 {
+  font-size: 1.45em;
+  margin: 0.25em 0;
+  color: #111c44;
+}
+
+/* line 40, ../sass/screen.scss */
+h3 {
+  font-size: 1.1em;
+  margin: 0.2em 0;
+  color: #1d3072;
+}
+
+/* line 46, ../sass/screen.scss */
+h1, h2, h3 {
+  text-align: center;
+  font-family: 'Gorditas', 'Helvetica Neue', 'Helvetica';
+}
+
+/* line 51, ../sass/screen.scss */
+p, li {
+  font-family: 'Pontano Sans', 'Helvetica Neue', 'Helvetica';
+  line-height: 120%;
+}
+
+/* line 56, ../sass/screen.scss */
+code, pre {
+  font-family: 'Courier New';
+}
+
+/* line 60, ../sass/screen.scss */
+.highlight {
+  font-size: 0.9em;
+  padding: 1em;
+  border: solid #3a60e5 1px;
+  margin: 1em 0;
+}
+
+/* line 68, ../sass/screen.scss */
+em {
+  font-style: italic;
+}
+
+/* line 72, ../sass/screen.scss */
+p {
+  margin: 0.7em 0;
+}
+
+/* line 76, ../sass/screen.scss */
+li {
+  list-style-type: disc;
+}
+
+/* line 80, ../sass/screen.scss */
+ul {
+  padding-left: 2em;
+}

@@ -1,2 +1,4 @@
 markdown: redcarpet
+auto: true
+pygments: true
 

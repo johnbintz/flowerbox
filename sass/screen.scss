@@ -4,3 +4,79 @@
  * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
 
 @import "compass/reset";
+@import "compass/css3";
+
+$base_color: #d9b741;
+$header_color: #000;
+$header_blend_color: #3a60e5;
+
+$code_border_color: $header_blend_color;
+
+body {
+  background-color: $base_color;
+}
+
+#container {
+  width: 550px;
+  margin: 0 auto;
+}
+
+h1, h2 {
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 1.75em;
+  margin: 0.35em 0;
+  color: mix($header_color, $header_blend_color, 90);
+}
+
+h2 {
+  font-size: 1.45em;
+  margin: 0.25em 0;
+  color: mix($header_color, $header_blend_color, 70);
+}
+
+h3 {
+  font-size: 1.1em;
+  margin: 0.2em 0;
+  color: mix($header_color, $header_blend_color, 50);
+}
+
+h1, h2, h3 {
+  text-align: center;
+  font-family: 'Gorditas', 'Helvetica Neue', 'Helvetica';
+}
+
+p, li {
+  font-family: 'Pontano Sans', 'Helvetica Neue', 'Helvetica';
+  line-height: 120%;
+}
+
+code, pre {
+  font-family: 'Courier New';
+}
+
+.highlight {
+  font-size: 0.9em;
+  padding: 1em;
+  border: solid $code_border_color 1px;
+
+  margin: 1em 0;
+}
+
+em {
+  font-style: italic;
+}
+
+p {
+  margin: 0.7em 0;
+}
+
+li {
+  list-style-type: disc;
+}
+
+ul {
+  padding-left: 2em;
+}

@@ -30,7 +30,16 @@ module Flowerbox
     end
 
     def start(message)
-      @reporters.each { |reporter| reporter.start(message) }
+      on_each_reporter(:start, message)
+    end
+
+    def log(message)
+      on_each_reporter(:log, message)
+    end
+
+    private
+    def on_each_reporter(method, message)
+      @reporters.each { |reporter| reporter.send(method, message) }
     end
   end
 end

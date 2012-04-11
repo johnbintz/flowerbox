@@ -12,7 +12,10 @@ module Flowerbox
 
     def _call(env)
       if sprockets_file = env['PATH_INFO'][%r{/__F__(.*)$}, 1]
-        sprockets.call(env.merge('QUERY_STRING' => 'body=1', 'PATH_INFO' => sprockets_file))
+        result = sprockets.call(env.merge('QUERY_STRING' => 'body=1', 'PATH_INFO' => sprockets_file))
+        result[1]['Cache-Control'] = 'max-age: 0'
+
+        result
       else
         [ 200, { 'Content-type' => 'text/html' }, [ runner.template ] ]
       end

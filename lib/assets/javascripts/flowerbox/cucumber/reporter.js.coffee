@@ -1,5 +1,5 @@
-Flowerbox ||= {}
-Flowerbox.Cucumber ||= {}
+Flowerbox = Flowerbox || {}
+Flowerbox.Cucumber = Flowerbox.Cucumber || {}
 
 class Flowerbox.Cucumber.Reporter
   nameParts: ->

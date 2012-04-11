@@ -17,7 +17,18 @@ module Flowerbox
 
         result
       else
-        [ 200, { 'Content-type' => 'text/html' }, [ runner.template ] ]
+        begin
+          template = runner.template
+
+          [ 200, { 'Content-type' => 'text/html' }, [ template ] ]
+        rescue => e
+          $stderr.puts
+          $stderr.puts e.message
+          $stderr.puts e.backtrace.join("\n")
+          $stderr.puts
+
+          [ 500, {}, [] ]
+        end
       end
     end
   end

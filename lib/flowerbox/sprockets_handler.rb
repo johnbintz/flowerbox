@@ -69,6 +69,10 @@ module Flowerbox
 
       raise LogicalPathNotFoundError.new("Could not find logical path for #{asset_path}")
     end
+
+    def reset!
+      @environment.send(:expire_index!)
+    end
   end
 end
 

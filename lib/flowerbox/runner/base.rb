@@ -95,6 +95,8 @@ module Flowerbox
               raise RunnerDiedError.new if attempts == 0
 
               Flowerbox.server = nil
+            ensure
+              @sprockets.reset!
             end
           end
 

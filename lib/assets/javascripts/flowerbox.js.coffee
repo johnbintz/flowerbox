@@ -4,6 +4,7 @@ Flowerbox =
     Flowerbox.contact('ping')
 
   messageQueue: []
+  pulling: false
 
   contact: (url, data...) ->
     Flowerbox.started = true
@@ -12,16 +13,19 @@ Flowerbox =
       message = [ url, data ]
       Flowerbox.messageQueue.push(message)
 
-      Flowerbox.queuePuller() if Flowerbox.socket
+      if Flowerbox.socket && !Flowerbox.pulling
+        Flowerbox.queuePuller()
 
   started: false
   done: false
 
   queuePuller: ->
+    Flowerbox.pulling = true
+
     if Flowerbox.messageQueue.length > 0
       message = Flowerbox.messageQueue.shift()
 
-      Flowerbox.socket.send JSON.stringify(message), {}, ->
+      Flowerbox.socket.onmessage = (data) ->
         if message[0] == 'results'
           if __$instrument?
             Flowerbox.socket.send JSON.stringify(['instrument', __$instrument]) {}, ->
@@ -30,6 +34,10 @@ Flowerbox =
             Flowerbox.done = true
 
         Flowerbox.queuePuller()
+
+      Flowerbox.socket.send JSON.stringify(message)
+    else
+      setTimeout(Flowerbox.queuePuller, 10) if !Flowerbox.done
 
   fail: ->
 

@@ -49,7 +49,11 @@ module Flowerbox
 
         output = runner.send(command, [ data ].flatten)
 
-        ws.send(output) if command == 'load'
+        if command == 'load'
+          ws.send(output)
+        else
+          ws.send("ok")
+        end
       }
     end
 

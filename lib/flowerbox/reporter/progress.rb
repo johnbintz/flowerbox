@@ -1,3 +1,5 @@
+require 'flowerbox/reporter/console_base'
+
 module Flowerbox::Reporter
   class Progress < ConsoleBase
     def report_progress(result)

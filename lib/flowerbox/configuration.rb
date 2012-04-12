@@ -58,7 +58,7 @@ module Flowerbox
       end
 
       if reporters.empty?
-        reporters << Flowerbox::Reporter.for(:progress)
+        reporters << :progress
       end
     end
   end

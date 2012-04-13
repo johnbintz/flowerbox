@@ -21,7 +21,7 @@ module Flowerbox
 
       def run(sprockets, spec_files, options)
         super do
-          navigate = Proc.new { browser.navigate.to "http://localhost:#{server.port}/" }
+          navigate = Proc.new { browser.navigate.to "http://localhost:#{server.port}/?#{Time.now.to_f}" }
 
           begin
             navigate.call
@@ -83,7 +83,7 @@ HTML
       end
 
       def template_files
-        sprockets.files.collect { |file| %{<script type="text/javascript" src="/__F__/#{sprockets.logical_path_for(file)}"></script>} }
+        sprockets.files.collect { |file| %{<script type="text/javascript" src="/__F__/#{sprockets.logical_path_for(file)}?#{Time.now.to_f}"></script>} }
       end
     end
   end

@@ -47,12 +47,18 @@ module Flowerbox
       ws.onmessage { |message|
         command, data = JSON.parse(message)
 
-        output = runner.send(command, [ data ].flatten)
+        begin
+          output = runner.send(command, [ data ].flatten)
 
-        if command == 'load'
-          ws.send(output)
-        else
-          ws.send("ok")
+          if command == 'load'
+            ws.send(output)
+          else
+            ws.send("ok")
+          end
+        rescue => e
+          $stderr.puts e.message
+
+          exit 1
         end
       }
     end

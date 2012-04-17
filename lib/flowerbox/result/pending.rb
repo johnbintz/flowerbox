@@ -7,6 +7,8 @@ module Flowerbox::Result
     def failure?
       false
     end
+
+    def failures; [] ; end
   end
 end
 

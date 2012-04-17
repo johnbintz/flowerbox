@@ -108,7 +108,7 @@ module Flowerbox
         @results
       rescue => e
         case e
-        when ExecJS::RuntimeError, ExecJS::ProgramError, Sprockets::FileNotFound
+        when ExecJS::RuntimeError, ExecJS::ProgramError, Sprockets::FileNotFound, Sprockets::CircularDependencyError
           handle_coffeescript_compilation_error(e)
         else
           raise e

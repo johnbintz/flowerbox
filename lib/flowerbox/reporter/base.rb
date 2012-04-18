@@ -47,6 +47,7 @@ module Flowerbox
       end
 
       def post_report_failed(data) ; end
+
       def report_numeric_results(gathered_results, data = {}) ; end
 
       def start(message) ; end

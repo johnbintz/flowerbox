@@ -167,6 +167,22 @@ Flowerbox.World ->
     Put = 'some stuff back'
     callback()
 {% endhighlight %}
+
+## Auto-generate missing steps
+### (see [cucumber-step_writer](http://github.com/johnbintz/cucumber-step_writer) for my philosophy)
+
+{% highlight ruby %}
+# js-features/spec_helper.rb
+
+Flowerbox.configure do |c|
+  c.report_with :verbose
+  c.reporters.add(
+    :step_writer,
+    :target => 'js-features/step_definitions',
+    :on_finish => lambda { |dir| system %{open #{dir}} }
+  )
+end
+{% endhighlight %}
 ---
 
 # Flowerbox! Yea...wha?
